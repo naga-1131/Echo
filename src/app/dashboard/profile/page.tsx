@@ -10,6 +10,7 @@ import EditProfileForm from './components/edit-profile-form';
 import {Users, UserPlus} from 'lucide-react';
 import { usePosts } from '../components/posts-provider';
 import { useUser } from '../components/user-provider';
+import Link from 'next/link';
 
 const mockCommunities = [
   {id: 'c1', name: 'Global Climate Action', memberCount: 1200, imageUrl: 'https://picsum.photos/seed/c1/200/200'},

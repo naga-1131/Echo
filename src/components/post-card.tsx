@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from 'next/link';
 import { formatDistanceToNow } from "date-fns";
 import {
   Card,
@@ -11,11 +12,14 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Repeat, Bookmark, Share2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Heart, MessageCircle, Repeat, Bookmark, Share2, MoreHorizontal, Trash2 } from "lucide-react";
 import type { Post, User } from "@/lib/types";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import CommentSection from "./comment-section";
+import { useUser } from "@/app/dashboard/components/user-provider";
+import { usePosts } from "@/app/dashboard/components/posts-provider";
 
 interface PostCardProps {
   post: Post;
@@ -23,6 +27,8 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, user }: PostCardProps) {
+  const { user: currentUser } = useUser();
+  const { deletePost } = usePosts();
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
@@ -37,19 +43,42 @@ export default function PostCard({ post, user }: PostCardProps) {
     setIsSaved(!isSaved);
   };
 
+  const handleDelete = () => {
+    deletePost(post.id);
+  }
+
+  const isOwnPost = currentUser?.id === post.userId;
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-row items-center gap-4 p-4">
-        <Avatar>
-          <AvatarImage src={user.profilePic} alt={user.username} data-ai-hint="user avatar" />
-          <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <Link href={`/dashboard/profile/${user.id}`}>
+          <Avatar>
+            <AvatarImage src={user.profilePic} alt={user.username} data-ai-hint="user avatar" />
+            <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </Link>
         <div className="flex-1">
-          <p className="font-semibold">{user.username}</p>
+           <Link href={`/dashboard/profile/${user.id}`} className="font-semibold hover:underline">{user.username}</Link>
           <p className="text-sm text-muted-foreground">
             {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
           </p>
         </div>
+         {isOwnPost && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </CardHeader>
       <CardContent className="px-4 pb-2">
         <p className="whitespace-pre-wrap">{post.text}</p>
