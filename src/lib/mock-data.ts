@@ -1,6 +1,6 @@
 
 
-import type { User, Post, WasteReport, Comment, Notification } from './types';
+import type { User, Post, WasteReport, Comment, Notification, Community } from './types';
 
 export const mockUsers: User[] = [
   {
@@ -64,6 +64,25 @@ export const mockPosts: Post[] = [
     comments: [],
   },
 ];
+
+export const mockCommunities: Community[] = [
+    {
+        id: 'c1',
+        name: 'Urban Gardeners',
+        description: 'Sharing tips and tricks for growing food in the city.',
+        imageUrl: 'https://picsum.photos/seed/c1/100/100',
+        memberCount: 1204,
+        adminId: 'u2',
+    },
+    {
+        id: 'c2',
+        name: 'Zero-Waste Warriors',
+        description: 'A community for those on the journey to a zero-waste lifestyle.',
+        imageUrl: 'https://picsum.photos/seed/c2/100/100',
+        memberCount: 589,
+        adminId: 'u1',
+    }
+]
 
 export const mockReports: WasteReport[] = [
     {
