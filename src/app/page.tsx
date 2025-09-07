@@ -23,7 +23,7 @@ export default function LoginPage() {
           <CardDescription>Connect for a Greener Planet</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -45,13 +45,17 @@ export default function LoginPage() {
               </div>
               <Input id="password" type="password" required />
             </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
-          </div>
+            <Link href="/dashboard" passHref>
+               <Button type="button" className="w-full">
+                  Login
+               </Button>
+            </Link>
+            <Link href="/dashboard" passHref>
+               <Button variant="outline" type="button" className="w-full">
+                  Login with Google
+               </Button>
+            </Link>
+          </form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline">

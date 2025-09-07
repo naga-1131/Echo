@@ -23,7 +23,7 @@ export default function SignupPage() {
           <CardDescription>Join our community and start making a difference.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
               <Input id="username" placeholder="greenturtle" required />
@@ -41,10 +41,12 @@ export default function SignupPage() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required />
             </div>
-            <Button type="submit" className="w-full">
-              Create Account
-            </Button>
-          </div>
+            <Link href="/dashboard" passHref>
+               <Button type="button" className="w-full">
+                  Create Account
+               </Button>
+            </Link>
+          </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/" className="underline">
