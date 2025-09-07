@@ -2,14 +2,14 @@
 "use client";
 
 import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent} from '@/components/ui/card';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import { mockUsers } from '@/lib/mock-data';
 import PostCard from '@/components/post-card';
 import EditProfileForm from './components/edit-profile-form';
-import {Users} from 'lucide-react';
+import {Users, UserPlus} from 'lucide-react';
 import { usePosts } from '../components/posts-provider';
+import { useUser } from '../components/user-provider';
 
 const mockCommunities = [
   {id: 'c1', name: 'Global Climate Action', memberCount: 1200, imageUrl: 'https://picsum.photos/seed/c1/200/200'},
@@ -18,7 +18,12 @@ const mockCommunities = [
 
 export default function ProfilePage() {
   const { posts } = usePosts();
-  const user = mockUsers[0];
+  const { user } = useUser();
+  
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   const userPosts = posts.filter(p => p.userId === user.id).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   const savedPosts = posts.filter(p => user.savedPosts.includes(p.id)).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   const userCommunities = mockCommunities.filter(c =>
@@ -39,7 +44,7 @@ export default function ProfilePage() {
             <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex justify-end mb-4">
-            <EditProfileForm user={user} />
+            <EditProfileForm />
           </div>
           <div className="pt-12">
             <h1 className="text-2xl font-bold font-headline">
@@ -49,9 +54,16 @@ export default function ProfilePage() {
               @{user.username.toLowerCase()}
             </p>
             <p className="mt-2 text-sm">
-              Passionate about creating a sustainable future. Let&apos;s
-              connect and collaborate for a greener planet! 🌍💚
+              {user.bio}
             </p>
+            <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                    <span className="font-bold text-foreground">{user.following.length}</span> Following
+                </div>
+                 <div className="flex items-center gap-1">
+                    <span className="font-bold text-foreground">{user.followers.length}</span> Followers
+                </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -65,8 +77,7 @@ export default function ProfilePage() {
         <TabsContent value="posts">
           <div className="space-y-6 mt-6">
             {userPosts.map(post => {
-              const postUser = mockUsers.find(u => u.id === post.userId);
-              if (!postUser) return null;
+              const postUser = mockUsers.find(u => u.id === post.userId) || user;
               return <PostCard key={post.id} post={post} user={postUser} />;
             })}
              {userPosts.length === 0 && <p className="text-muted-foreground text-center py-8">No posts yet.</p>}

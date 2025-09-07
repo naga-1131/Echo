@@ -4,8 +4,11 @@ export interface User {
   username: string;
   email: string;
   profilePic: string;
+  bio?: string;
   savedPosts: string[];
   communities: string[];
+  followers: string[];
+  following: string[];
 }
 
 export interface Post {

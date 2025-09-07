@@ -7,16 +7,22 @@ export const mockUsers: User[] = [
     username: 'JaneDoe',
     email: 'jane.doe@example.com',
     profilePic: 'https://picsum.photos/id/1027/100/100',
+    bio: "Passionate about creating a sustainable future. Let's connect and collaborate for a greener planet! 🌍💚",
     savedPosts: ['p2'],
     communities: ['c1'],
+    followers: ['u2'],
+    following: ['u2'],
   },
   {
     id: 'u2',
     username: 'JohnSmith',
     email: 'john.smith@example.com',
     profilePic: 'https://picsum.photos/id/1005/100/100',
+    bio: 'Eco-innovator and nature enthusiast. Building a better tomorrow, one green step at a time.',
     savedPosts: [],
     communities: ['c1', 'c2'],
+    followers: ['u1'],
+    following: ['u1'],
   },
 ];
 

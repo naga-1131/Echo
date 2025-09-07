@@ -17,11 +17,13 @@ import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import CreatePostForm from "./create-post-form";
 import { useRouter } from "next/navigation";
+import { useUser } from "./user-provider";
 
 export default function Header() {
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const { user } = useUser();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +31,8 @@ export default function Header() {
       router.push(`/dashboard/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+
+  if (!user) return null;
 
   return (
     <>
@@ -59,11 +63,11 @@ export default function Header() {
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar>
                 <AvatarImage
-                  src="https://picsum.photos/100"
-                  alt="User"
+                  src={user.profilePic}
+                  alt={user.username}
                   data-ai-hint="user avatar"
                 />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
@@ -71,7 +75,7 @@ export default function Header() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Logout</DropdownMenuItem>
