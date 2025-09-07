@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useEffect } from 'react';
@@ -17,6 +18,7 @@ import MainNav from './components/main-nav';
 import { PostsProvider } from './components/posts-provider';
 import { useUser } from './components/user-provider';
 import SidebarUser from './components/sidebar-user';
+import { NotificationsProvider } from './components/notifications-provider';
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
@@ -64,8 +66,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
+    <NotificationsProvider>
       <PostsProvider>
         <ProtectedLayout>{children}</ProtectedLayout>
       </PostsProvider>
+    </NotificationsProvider>
   );
 }

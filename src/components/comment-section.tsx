@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -13,13 +14,14 @@ import { useUser } from "@/app/dashboard/components/user-provider";
 interface CommentSectionProps {
   postId: string;
   comments: Comment[];
+  onCommentAdded: () => void;
 }
 
 const getUserById = (userId: string): User | undefined => {
   return mockUsers.find((user) => user.id === userId);
 };
 
-export default function CommentSection({ postId, comments: initialComments }: CommentSectionProps) {
+export default function CommentSection({ postId, comments: initialComments, onCommentAdded }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
   const { user: currentUser } = useUser();
@@ -36,6 +38,7 @@ export default function CommentSection({ postId, comments: initialComments }: Co
     };
     setComments([...comments, newCommentObj]);
     setNewComment("");
+    onCommentAdded();
   };
 
   if (!currentUser) return null;

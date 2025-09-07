@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Image from "next/image";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 import CommentSection from "./comment-section";
 import { useUser } from "@/app/dashboard/components/user-provider";
 import { usePosts } from "@/app/dashboard/components/posts-provider";
+import { useNotifications } from "@/app/dashboard/components/notifications-provider";
 
 interface PostCardProps {
   post: Post;
@@ -29,14 +31,24 @@ interface PostCardProps {
 export default function PostCard({ post, user }: PostCardProps) {
   const { user: currentUser } = useUser();
   const { deletePost } = usePosts();
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const { addNotification } = useNotifications();
+  const [isLiked, setIsLiked] = useState(currentUser ? post.likes.includes(currentUser.id) : false);
+  const [isSaved, setIsSaved] = useState(currentUser ? currentUser.savedPosts.includes(post.id) : false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [showComments, setShowComments] = useState(false);
 
   const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+    if (!currentUser) return;
+    const newIsLiked = !isLiked;
+    setIsLiked(newIsLiked);
+    setLikeCount(newIsLiked ? likeCount + 1 : likeCount - 1);
+    if(newIsLiked && currentUser.id !== post.userId) {
+      addNotification({
+        type: 'like',
+        fromUser: currentUser,
+        post,
+      });
+    }
   };
 
   const handleSave = () => {
@@ -45,6 +57,15 @@ export default function PostCard({ post, user }: PostCardProps) {
 
   const handleDelete = () => {
     deletePost(post.id);
+  }
+
+  const handleCommentAdded = () => {
+    if (!currentUser || currentUser.id === post.userId) return;
+     addNotification({
+        type: 'comment',
+        fromUser: currentUser,
+        post,
+      });
   }
 
   const isOwnPost = currentUser?.id === post.userId;
@@ -114,7 +135,7 @@ export default function PostCard({ post, user }: PostCardProps) {
             <Share2 className="h-4 w-4" />
           </Button>
         </div>
-        {showComments && <CommentSection postId={post.id} comments={post.comments} />}
+        {showComments && <CommentSection postId={post.id} comments={post.comments} onCommentAdded={handleCommentAdded} />}
       </CardFooter>
     </Card>
   );

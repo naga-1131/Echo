@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   username: string;
@@ -48,4 +49,13 @@ export interface WasteReport {
   location: { lat: number; lng: number };
   status: 'open' | 'in-progress' | 'closed';
   timestamp: Date;
+}
+
+export interface Notification {
+  id: string;
+  type: 'like' | 'comment' | 'follow';
+  fromUser: User;
+  post?: Post;
+  timestamp: Date;
+  read: boolean;
 }

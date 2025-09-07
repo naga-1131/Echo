@@ -1,5 +1,6 @@
 
-import type { User, Post, WasteReport, Comment } from './types';
+
+import type { User, Post, WasteReport, Comment, Notification } from './types';
 
 export const mockUsers: User[] = [
   {
@@ -93,3 +94,29 @@ export const mockReports: WasteReport[] = [
         timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
     },
 ];
+
+export const mockNotifications: Notification[] = [
+    {
+        id: 'n1',
+        type: 'like',
+        fromUser: mockUsers[1],
+        post: mockPosts[0],
+        timestamp: new Date(Date.now() - 1000 * 60 * 5),
+        read: false,
+    },
+    {
+        id: 'n2',
+        type: 'follow',
+        fromUser: mockUsers[1],
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+        read: true,
+    },
+     {
+        id: 'n3',
+        type: 'comment',
+        fromUser: mockUsers[1],
+        post: mockPosts[0],
+        timestamp: new Date(Date.now() - 1000 * 60 * 60),
+        read: false,
+    },
+]

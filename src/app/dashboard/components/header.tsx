@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -18,6 +19,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import CreatePostForm from "./create-post-form";
 import { useRouter } from "next/navigation";
 import { useUser } from "./user-provider";
+import Notifications from "./notifications";
 
 export default function Header() {
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
@@ -63,6 +65,7 @@ export default function Header() {
           <PlusCircle className="h-4 w-4" />
           Create Post
         </Button>
+        <Notifications />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">

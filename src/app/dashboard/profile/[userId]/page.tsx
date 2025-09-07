@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -13,6 +14,7 @@ import { mockUsers } from '@/lib/mock-data';
 import type { User as UserType } from '@/lib/types';
 import { UserPlus, UserCheck } from 'lucide-react';
 import UserListDialog from '../../components/user-list-dialog';
+import { useNotifications } from '../../components/notifications-provider';
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -21,6 +23,7 @@ export default function UserProfilePage() {
   
   const { user: currentUser, updateUser } = useUser();
   const { posts } = usePosts();
+  const { addNotification } = useNotifications();
   const [profileUser, setProfileUser] = useState<UserType | null>(null);
   const [followersOpen, setFollowersOpen] = useState(false);
   const [followingOpen, setFollowingOpen] = useState(false);
@@ -46,15 +49,20 @@ export default function UserProfilePage() {
 
   const handleFollowToggle = () => {
     if (!profileUser) return;
+    const newIsFollowing = !isFollowing;
 
-    if (isFollowing) {
+    if (newIsFollowing) {
+      // Follow
+      updateUser({ following: [...currentUser.following, profileUser.id] });
+      setProfileUser(prev => prev ? { ...prev, followers: [...prev.followers, currentUser.id] } : null);
+       addNotification({
+          type: 'follow',
+          fromUser: currentUser,
+        });
+    } else {
       // Unfollow
       updateUser({ following: currentUser.following.filter(id => id !== profileUser.id) });
       setProfileUser(prev => prev ? { ...prev, followers: prev.followers.filter(id => id !== currentUser.id) } : null);
-    } else {
-      // Follow
-      updateUser({ following: [...currentUser.following, profileUser.id] });
-       setProfileUser(prev => prev ? { ...prev, followers: [...prev.followers, currentUser.id] } : null);
     }
   };
 
