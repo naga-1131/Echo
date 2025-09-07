@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EchoSyncLogo } from "@/components/icons";
-import { mockUsers } from "@/lib/mock-data";
 import Link from "next/link";
 import { useUser } from "./dashboard/components/user-provider";
 
@@ -23,10 +22,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("password");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useUser();
+  const { login, users } = useUser();
 
   const handleLogin = () => {
-    const userToLogin = mockUsers.find(u => u.email === email);
+    // Use the dynamic users list from the provider
+    const userToLogin = users.find(u => u.email === email);
     if (userToLogin) {
       login(userToLogin.id);
       router.push("/dashboard");
