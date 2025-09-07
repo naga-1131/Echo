@@ -29,9 +29,10 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, user }: PostCardProps) {
-  const { user: currentUser } = useUser();
+  const { user: currentUser, updateUser } = useUser();
   const { deletePost } = usePosts();
   const { addNotification } = useNotifications();
+
   const [isLiked, setIsLiked] = useState(currentUser ? post.likes.includes(currentUser.id) : false);
   const [isSaved, setIsSaved] = useState(currentUser ? currentUser.savedPosts.includes(post.id) : false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
@@ -42,6 +43,8 @@ export default function PostCard({ post, user }: PostCardProps) {
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
     setLikeCount(newIsLiked ? likeCount + 1 : likeCount - 1);
+    
+    // Only send a notification if the person liking is NOT the post owner
     if(newIsLiked && currentUser.id !== post.userId) {
       addNotification({
         type: 'like',
@@ -52,7 +55,14 @@ export default function PostCard({ post, user }: PostCardProps) {
   };
 
   const handleSave = () => {
-    setIsSaved(!isSaved);
+    if (!currentUser) return;
+    const newIsSaved = !isSaved;
+    setIsSaved(newIsSaved);
+    if (newIsSaved) {
+        updateUser({ savedPosts: [...currentUser.savedPosts, post.id] });
+    } else {
+        updateUser({ savedPosts: currentUser.savedPosts.filter(id => id !== post.id) });
+    }
   };
 
   const handleDelete = () => {
@@ -61,6 +71,7 @@ export default function PostCard({ post, user }: PostCardProps) {
 
   const handleCommentAdded = () => {
     if (!currentUser) return;
+     // Only send a notification if the person commenting is NOT the post owner
     if (currentUser.id !== post.userId) {
      addNotification({
         type: 'comment',
@@ -75,14 +86,14 @@ export default function PostCard({ post, user }: PostCardProps) {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-row items-center gap-4 p-4">
-        <Link href={`/dashboard/profile/${user.id}`}>
+        <Link href={isOwnPost ? `/dashboard/profile` : `/dashboard/profile/${user.id}`}>
           <Avatar>
             <AvatarImage src={user.profilePic} alt={user.username} data-ai-hint="user avatar" />
             <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
           </Avatar>
         </Link>
         <div className="flex-1">
-           <Link href={`/dashboard/profile/${user.id}`} className="font-semibold hover:underline">{user.username}</Link>
+           <Link href={isOwnPost ? `/dashboard/profile` : `/dashboard/profile/${user.id}`} className="font-semibold hover:underline">{user.username}</Link>
           <p className="text-sm text-muted-foreground">
             {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
           </p>
@@ -130,7 +141,7 @@ export default function PostCard({ post, user }: PostCardProps) {
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
             <Repeat className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleSave} className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={handleSave} className="flex items-center gap-2" disabled={!currentUser}>
             <Bookmark className={cn("h-4 w-4", isSaved && "fill-primary text-primary")} />
           </Button>
           <Button variant="ghost" size="sm" className="flex items-center gap-2">

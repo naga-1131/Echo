@@ -21,26 +21,30 @@ export default function UserProfilePage() {
   const router = useRouter();
   const { userId } = params;
   
-  const { user: currentUser, updateUser } = useUser();
+  const { user: currentUser, updateUser: updateCurrentUser } = useUser();
   const { posts } = usePosts();
   const { addNotification } = useNotifications();
+  
+  // State for the user whose profile is being viewed
   const [profileUser, setProfileUser] = useState<UserType | null>(null);
+
   const [followersOpen, setFollowersOpen] = useState(false);
   const [followingOpen, setFollowingOpen] = useState(false);
   
   useEffect(() => {
     if (userId) {
       if (userId === currentUser?.id) {
+        // Redirect to the main profile page if viewing own profile via dynamic route
         router.push('/dashboard/profile');
         return;
       }
       const foundUser = mockUsers.find(u => u.id === userId);
-      setProfileUser(foundUser ? {...foundUser} : null); // Create a copy to avoid direct mutation
+      setProfileUser(foundUser || null); 
     }
   }, [userId, currentUser, router]);
 
   if (!profileUser || !currentUser) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // Or a skeleton loader
   }
 
   const userPosts = posts.filter(p => p.userId === profileUser.id).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -52,18 +56,24 @@ export default function UserProfilePage() {
     const newIsFollowing = !isFollowing;
 
     if (newIsFollowing) {
-      // Follow
-      updateUser({ following: [...currentUser.following, profileUser.id] });
-      setProfileUser(prev => prev ? { ...prev, followers: [...prev.followers, currentUser.id] } : null);
+      // Current user follows profileUser
+      updateCurrentUser({ following: [...currentUser.following, profileUser.id] });
+      // Update the mock data for the profile user
+      const profileUserInMock = mockUsers.find(u => u.id === profileUser.id);
+      if(profileUserInMock) profileUserInMock.followers.push(currentUser.id);
+
        addNotification({
           type: 'follow',
           fromUser: currentUser,
         });
     } else {
-      // Unfollow
-      updateUser({ following: currentUser.following.filter(id => id !== profileUser.id) });
-      setProfileUser(prev => prev ? { ...prev, followers: prev.followers.filter(id => id !== currentUser.id) } : null);
+      // Current user unfollows profileUser
+      updateCurrentUser({ following: currentUser.following.filter(id => id !== profileUser.id) });
+      const profileUserInMock = mockUsers.find(u => u.id === profileUser.id);
+      if(profileUserInMock) profileUserInMock.followers = profileUserInMock.followers.filter(id => id !== currentUser.id);
     }
+     // Force re-render to reflect changes immediately
+    setProfileUser(mockUsers.find(u => u.id === profileUser.id) || null);
   };
 
   const getFollowers = (): UserType[] => {
@@ -107,10 +117,10 @@ export default function UserProfilePage() {
             </p>
              <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
                 <button onClick={() => setFollowingOpen(true)} className="flex items-center gap-1 hover:underline">
-                    <span className="font-bold text-foreground">{profileUser.following.length}</span> Following
+                    <span className="font-bold text-foreground">{getFollowing().length}</span> Following
                 </button>
                  <button onClick={() => setFollowersOpen(true)} className="flex items-center gap-1 hover:underline">
-                    <span className="font-bold text-foreground">{profileUser.followers.length}</span> Followers
+                    <span className="font-bold text-foreground">{getFollowers().length}</span> Followers
                 </button>
             </div>
           </div>
