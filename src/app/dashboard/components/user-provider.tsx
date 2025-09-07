@@ -8,6 +8,7 @@ import { mockUsers } from '@/lib/mock-data';
 interface UserContextType {
   user: User | null;
   users: User[];
+  loading: boolean;
   addUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
   login: (userId: string, userObj?: User) => void;
@@ -19,6 +20,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>(mockUsers);
+  const [loading, setLoading] = useState(true); // Add loading state
 
    useEffect(() => {
     // Prevent hydration errors by running this on the client only
@@ -28,6 +30,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             const loggedInUser = users.find(u => u.id === storedUserId) || null;
             setUser(loggedInUser);
         }
+        setLoading(false); // Set loading to false after checking storage
     }
   }, [users]);
 
@@ -65,20 +68,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
               const newFollowing = updatedUser.following;
 
               // If a user was added to following
-              const followedId = newFollowing?.find(id => !oldFollowing.includes(id));
-              if(followedId) {
-                  const followedUserIndex = newUsers.findIndex(u => u.id === followedId);
-                  if(followedUserIndex !== -1) {
-                      newUsers[followedUserIndex].followers.push(user.id);
+              if (newFollowing && oldFollowing) {
+                  const followedId = newFollowing.find(id => !oldFollowing.includes(id));
+                  if(followedId) {
+                      const followedUserIndex = newUsers.findIndex(u => u.id === followedId);
+                      if(followedUserIndex !== -1) {
+                          newUsers[followedUserIndex].followers.push(user.id);
+                      }
                   }
               }
 
               // If a user was removed from following
-              const unfollowedId = oldFollowing?.find(id => !newFollowing?.includes(id));
-              if(unfollowedId) {
-                  const unfollowedUserIndex = newUsers.findIndex(u => u.id === unfollowedId);
-                  if(unfollowedUserIndex !== -1) {
-                      newUsers[unfollowedUserIndex].followers = newUsers[unfollowedUserIndex].followers.filter(id => id !== user.id);
+              if (newFollowing && oldFollowing) {
+                  const unfollowedId = oldFollowing.find(id => !newFollowing.includes(id));
+                  if(unfollowedId) {
+                      const unfollowedUserIndex = newUsers.findIndex(u => u.id === unfollowedId);
+                      if(unfollowedUserIndex !== -1) {
+                          newUsers[unfollowedUserIndex].followers = newUsers[unfollowedUserIndex].followers.filter(id => id !== user.id);
+                      }
                   }
               }
 
@@ -91,7 +98,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, users, addUser, updateUser, login, logout }}>
+    <UserContext.Provider value={{ user, users, loading, addUser, updateUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );

@@ -15,9 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EchoSyncLogo } from "@/components/icons";
-import { useUser } from "../dashboard/components/user-provider";
+import { useUser, UserProvider } from "../dashboard/components/user-provider";
 
-export default function SignupPage() {
+function SignupComponent() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -108,4 +108,12 @@ export default function SignupPage() {
       </Card>
     </div>
   );
+}
+
+export default function SignupPage() {
+  return (
+    <UserProvider>
+      <SignupComponent />
+    </UserProvider>
+  )
 }

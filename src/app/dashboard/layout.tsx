@@ -21,19 +21,18 @@ import { NotificationsProvider } from './components/notifications-provider';
 import { WasteReportsProvider } from './map/components/waste-reports-provider';
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useUser();
+  const { user, loading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    // If there's no user and we are not on the server, redirect to login.
-    // The check `typeof window !== 'undefined'` is to prevent this from running during SSR.
-    if (typeof window !== 'undefined' && !user) {
+    // If loading is finished and there's no user, redirect to login.
+    if (!loading && !user) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
   
-  // Render nothing or a loading spinner while checking for user
-  if (!user) {
+  // While loading, render nothing or a loading spinner
+  if (loading || !user) {
     return null; 
   }
 

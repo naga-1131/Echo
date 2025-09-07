@@ -16,8 +16,10 @@ import { Label } from "@/components/ui/label";
 import { EchoSyncLogo } from "@/components/icons";
 import Link from "next/link";
 import { useUser } from "./dashboard/components/user-provider";
+import { UserProvider } from "./dashboard/components/user-provider";
 
-export default function LoginPage() {
+
+function LoginComponent() {
   const [email, setEmail] = useState("jane.doe@example.com");
   const [password, setPassword] = useState("password");
   const [error, setError] = useState("");
@@ -94,4 +96,13 @@ export default function LoginPage() {
       </Card>
     </div>
   );
+}
+
+
+export default function LoginPage() {
+  return (
+    <UserProvider>
+      <LoginComponent />
+    </UserProvider>
+  )
 }
