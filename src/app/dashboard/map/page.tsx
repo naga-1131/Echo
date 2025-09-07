@@ -1,3 +1,5 @@
+"use client";
+
 import { APIProvider } from "@vis.gl/react-google-maps";
 import WasteMap from "./components/waste-map";
 import { API_KEY } from "@/lib/google-maps-api-key";
