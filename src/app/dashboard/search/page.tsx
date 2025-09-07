@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search as SearchIcon, Users, FileText } from "lucide-react";
-import { mockUsers, mockPosts } from "@/lib/mock-data";
+import { mockUsers } from "@/lib/mock-data";
 import PostCard from "@/components/post-card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { User, Post } from "@/lib/types";
+import { usePosts } from "../components/posts-provider";
 
 export default function SearchPage() {
+  const { posts } = usePosts();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
@@ -27,7 +29,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (query) {
-      setFilteredPosts(mockPosts.filter((post) =>
+      setFilteredPosts(posts.filter((post) =>
         post.text.toLowerCase().includes(query.toLowerCase())
       ));
       setFilteredUsers(mockUsers.filter((user) =>
@@ -37,7 +39,7 @@ export default function SearchPage() {
         setFilteredPosts([]);
         setFilteredUsers([]);
     }
-  }, [query]);
+  }, [query, posts]);
 
   const getPostUser = (userId: string): User | undefined => {
       return mockUsers.find(u => u.id === userId);

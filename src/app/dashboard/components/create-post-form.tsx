@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { ImagePlus, X } from "lucide-react";
+import { usePosts } from "@/app/dashboard/components/posts-provider";
 
 interface CreatePostFormProps {
   open: boolean;
@@ -26,6 +27,7 @@ interface CreatePostFormProps {
 export default function CreatePostForm({ open, onOpenChange }: CreatePostFormProps) {
   const [postContent, setPostContent] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { addPost } = usePosts();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,8 +41,13 @@ export default function CreatePostForm({ open, onOpenChange }: CreatePostFormPro
   };
   
   const handlePostSubmit = () => {
-    console.log("New Post:", { postContent, image: imagePreview ? "Image attached" : "No image" });
-    // Here you would typically call a server action to create the post
+    if (!postContent.trim()) return;
+    
+    addPost({
+      text: postContent,
+      mediaUrl: imagePreview || undefined,
+    });
+
     setPostContent("");
     setImagePreview(null);
     onOpenChange(false);

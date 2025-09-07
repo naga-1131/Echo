@@ -1,12 +1,15 @@
 
+"use client";
+
 import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {mockPosts, mockUsers} from '@/lib/mock-data';
+import { mockUsers } from '@/lib/mock-data';
 import PostCard from '@/components/post-card';
 import EditProfileForm from './components/edit-profile-form';
 import {Users} from 'lucide-react';
+import { usePosts } from '../components/posts-provider';
 
 const mockCommunities = [
   {id: 'c1', name: 'Global Climate Action', memberCount: 1200, imageUrl: 'https://picsum.photos/seed/c1/200/200'},
@@ -14,9 +17,10 @@ const mockCommunities = [
 ];
 
 export default function ProfilePage() {
+  const { posts } = usePosts();
   const user = mockUsers[0];
-  const userPosts = mockPosts.filter(p => p.userId === user.id).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  const savedPosts = mockPosts.filter(p => user.savedPosts.includes(p.id)).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  const userPosts = posts.filter(p => p.userId === user.id).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  const savedPosts = posts.filter(p => user.savedPosts.includes(p.id)).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   const userCommunities = mockCommunities.filter(c =>
     user.communities.includes(c.id)
   );

@@ -1,10 +1,14 @@
 
+"use client";
+
 import PostCard from "@/components/post-card";
-import { mockPosts, mockUsers } from "@/lib/mock-data";
+import { mockUsers } from "@/lib/mock-data";
+import { usePosts } from "../components/posts-provider";
 
 export default function SavedPostsPage() {
+    const { posts } = usePosts();
     const currentUser = mockUsers[0];
-    const savedPosts = mockPosts.filter(p => currentUser.savedPosts.includes(p.id)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const savedPosts = posts.filter(p => currentUser.savedPosts.includes(p.id)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
     <div className="container mx-auto max-w-2xl">
