@@ -27,7 +27,7 @@ export interface Post {
 }
 
 export interface Comment {
-  id: string;
+  id:string;
   userId: string;
   text: string;
   timestamp: Date;
@@ -42,14 +42,18 @@ export interface Community {
   adminId: string;
 }
 
+export type WasteType = 'overflowing-bin' | 'plastic-dump' | 'e-waste' | 'litter' | 'other';
+
 export interface WasteReport {
   id: string;
   userId: string;
   photoUrl: string;
   description: string;
+  wasteType: WasteType;
   location: { lat: number; lng: number };
   status: 'open' | 'in-progress' | 'closed';
   timestamp: Date;
+  aiSuggestion?: string;
 }
 
 export interface Notification {

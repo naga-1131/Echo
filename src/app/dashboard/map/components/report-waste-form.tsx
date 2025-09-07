@@ -16,9 +16,13 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet";
-import { ImagePlus, X, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ImagePlus, X, Loader2, Bot } from "lucide-react";
 import { useWasteReports } from "./waste-reports-provider";
 import { useUser } from "../../components/user-provider";
+import type { WasteType } from "@/lib/types";
+import { analyzeWaste, type WasteAnalysisOutput } from "@/ai/flows/waste-analysis-flow";
 
 interface ReportWasteFormProps {
   open: boolean;
@@ -29,10 +33,14 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
   const { user } = useUser();
   const { addReport } = useWasteReports();
   const [description, setDescription] = useState("");
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [wasteType, setWasteType] = useState<WasteType | "">("");
+  const [photoDataUri, setPhotoDataUri] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocating, setIsLocating] = useState(true);
   const [error, setError] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<WasteAnalysisOutput | null>(null);
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const locationWatchId = useRef<number | null>(null);
@@ -43,7 +51,6 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
       setError("");
 
       if (navigator.geolocation) {
-        // Start watching the user's position for live updates
         locationWatchId.current = navigator.geolocation.watchPosition(
           (position) => {
             setLocation({
@@ -64,14 +71,12 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
         setIsLocating(false);
       }
     } else {
-      // Stop watching when the sheet is closed
       if (locationWatchId.current !== null) {
         navigator.geolocation.clearWatch(locationWatchId.current);
         locationWatchId.current = null;
       }
     }
 
-    // Cleanup function to clear the watch when the component unmounts
     return () => {
       if (locationWatchId.current !== null) {
         navigator.geolocation.clearWatch(locationWatchId.current);
@@ -79,12 +84,26 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
     };
   }, [open]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAnalysisResult(null);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhoto(reader.result as string);
+      reader.onloadend = async () => {
+        const dataUri = reader.result as string;
+        setPhotoDataUri(dataUri);
+        
+        // Start AI analysis
+        setIsAnalyzing(true);
+        try {
+          const result = await analyzeWaste({ photoDataUri: dataUri });
+          setAnalysisResult(result);
+        } catch (aiError) {
+          console.error("AI analysis failed:", aiError);
+          setError("AI analysis failed. Please try again.");
+        } finally {
+          setIsAnalyzing(false);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -92,16 +111,19 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
 
   const clearForm = () => {
     setDescription("");
-    setPhoto(null);
+    setWasteType("");
+    setPhotoDataUri(null);
     setLocation(null);
     setError("");
+    setAnalysisResult(null);
+    setIsAnalyzing(false);
     if (fileInputRef.current) {
         fileInputRef.current.value = "";
     }
   }
 
   const handleSubmit = () => {
-    if (!description || !photo || !location || !user) {
+    if (!description || !wasteType || !photoDataUri || !location || !user) {
         setError("Please fill all fields and ensure location is set.");
         return;
     };
@@ -109,22 +131,24 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
     addReport({
         userId: user.id,
         description,
-        photoUrl: photo,
+        wasteType,
+        photoUrl: photoDataUri,
         location,
+        aiSuggestion: analysisResult?.suggestion,
     });
 
     clearForm();
     onOpenChange(false);
   }
-
-  const isSubmitDisabled = !description || !photo || !location || isLocating;
+  
+  const isSubmitDisabled = !description || !wasteType || !photoDataUri || !location || isLocating || isAnalyzing;
 
   return (
     <Sheet open={open} onOpenChange={(isOpen) => {
         onOpenChange(isOpen);
         if (!isOpen) clearForm();
     }}>
-      <SheetContent>
+      <SheetContent className="sm:max-w-md overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Report a Waste Spot</SheetTitle>
           <SheetDescription>
@@ -133,21 +157,12 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
         </SheetHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="e.g., Overflowing bin, illegal dumping..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="photo">Photo</Label>
             <Input id="photo" type="file" accept="image/*" className="hidden" onChange={handleImageChange} ref={fileInputRef} />
-             {photo ? (
+             {photoDataUri ? (
               <div className="relative group">
-                <Image src={photo} alt="Selected preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" data-ai-hint="waste trash" />
-                <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => setPhoto(null)}>
+                <Image src={photoDataUri} alt="Selected preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" data-ai-hint="waste trash" />
+                <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => setPhotoDataUri(null)}>
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -162,6 +177,51 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
                 </Label>
             )}
           </div>
+          
+          {isAnalyzing && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin"/>
+                  <span>Analyzing waste with AI...</span>
+              </div>
+          )}
+
+          {analysisResult && (
+              <Alert>
+                  <Bot className="h-4 w-4" />
+                  <AlertTitle>Eco-AI Suggestion</AlertTitle>
+                  <AlertDescription>
+                    <p><span className="font-semibold">Identified Type:</span> {analysisResult.wasteType}</p>
+                    <p><span className="font-semibold">Recommendation:</span> {analysisResult.suggestion}</p>
+                  </AlertDescription>
+              </Alert>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="waste-type">Waste Type Tag</Label>
+             <Select value={wasteType} onValueChange={(value) => setWasteType(value as WasteType)}>
+              <SelectTrigger id="waste-type">
+                <SelectValue placeholder="Select a waste type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="overflowing-bin">Overflowing Bin</SelectItem>
+                <SelectItem value="plastic-dump">Plastic Dump</SelectItem>
+                <SelectItem value="e-waste">E-Waste</SelectItem>
+                <SelectItem value="litter">General Litter</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="e.g., Old television left on the curb, plastic bottles near the river..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          
            <div className="space-y-2">
             <Label htmlFor="location">Live Location</Label>
             <div className="flex items-center gap-2 h-10 px-3 py-2 text-sm rounded-md border border-input bg-muted">
@@ -184,6 +244,7 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
             <Button variant="outline">Cancel</Button>
           </SheetClose>
           <Button type="submit" onClick={handleSubmit} disabled={isSubmitDisabled}>
+            {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Submit Report
           </Button>
         </SheetFooter>

@@ -2,13 +2,22 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
-import type { WasteReport } from '@/lib/types';
+import type { WasteReport, WasteType } from '@/lib/types';
 import { mockReports } from '@/lib/mock-data';
 import { subHours } from 'date-fns';
 
+interface AddReportData {
+    userId: string;
+    description: string;
+    photoUrl: string;
+    wasteType: WasteType;
+    location: { lat: number; lng: number };
+    aiSuggestion?: string;
+}
+
 interface WasteReportsContextType {
   reports: WasteReport[];
-  addReport: (report: Omit<WasteReport, 'id' | 'status' | 'timestamp'>) => void;
+  addReport: (report: AddReportData) => void;
   updateReportStatus: (reportId: string, status: WasteReport['status']) => void;
 }
 
@@ -17,7 +26,7 @@ const WasteReportsContext = createContext<WasteReportsContextType | undefined>(u
 export function WasteReportsProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<WasteReport[]>(mockReports);
 
-  const addReport = (report: Omit<WasteReport, 'id' | 'status' | 'timestamp'>) => {
+  const addReport = (report: AddReportData) => {
     const newReport: WasteReport = {
       ...report,
       id: `r${Date.now()}`,
