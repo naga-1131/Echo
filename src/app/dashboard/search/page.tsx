@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useSearchParams } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -91,16 +92,18 @@ export default function SearchPage() {
                 <div className="space-y-4">
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((user) => (
-                      <div key={user.id} className="flex items-center gap-4 p-2 rounded-md hover:bg-muted">
-                        <Avatar>
-                          <AvatarImage src={user.profilePic} alt={user.username} data-ai-hint="user avatar" />
-                          <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-semibold">{user.username}</p>
-                          <p className="text-sm text-muted-foreground">@{user.username.toLowerCase()}</p>
+                      <Link href={`/dashboard/profile/${user.id}`} key={user.id} className="block">
+                        <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted">
+                          <Avatar>
+                            <AvatarImage src={user.profilePic} alt={user.username} data-ai-hint="user avatar" />
+                            <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{user.username}</p>
+                            <p className="text-sm text-muted-foreground">@{user.username.toLowerCase()}</p>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     ))
                   ) : (
                     <p className="text-muted-foreground text-center">No users found for "{query}".</p>
