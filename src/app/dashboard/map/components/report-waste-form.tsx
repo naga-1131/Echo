@@ -57,7 +57,7 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
             setError("Could not get your location. Please enable location services.");
             setIsLocating(false);
           },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
       } else {
         setError("Geolocation is not supported by this browser.");
@@ -163,12 +163,12 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
             )}
           </div>
            <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">Live Location</Label>
             <div className="flex items-center gap-2 h-10 px-3 py-2 text-sm rounded-md border border-input bg-muted">
                 {isLocating ? (
                     <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Acquiring your live location...</span>
+                        <span>Acquiring highest accuracy...</span>
                     </>
                 ) : location ? (
                     <span>{`Lat: ${location.lat.toFixed(6)}, Lng: ${location.lng.toFixed(6)}`}</span>
