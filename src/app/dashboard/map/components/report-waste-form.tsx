@@ -35,27 +35,48 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
   const [error, setError] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const locationWatchId = useRef<number | null>(null);
 
   useEffect(() => {
     if (open) {
       setIsLocating(true);
       setError("");
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-          setIsLocating(false);
-        },
-        (err) => {
-          console.error(err);
-          setError("Could not get your location. Please enable location services.");
-          setIsLocating(false);
-        },
-        { enableHighAccuracy: true } // Request high accuracy
-      );
+
+      if (navigator.geolocation) {
+        // Start watching the user's position for live updates
+        locationWatchId.current = navigator.geolocation.watchPosition(
+          (position) => {
+            setLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+            setIsLocating(false);
+          },
+          (err) => {
+            console.error(err);
+            setError("Could not get your location. Please enable location services.");
+            setIsLocating(false);
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      } else {
+        setError("Geolocation is not supported by this browser.");
+        setIsLocating(false);
+      }
+    } else {
+      // Stop watching when the sheet is closed
+      if (locationWatchId.current !== null) {
+        navigator.geolocation.clearWatch(locationWatchId.current);
+        locationWatchId.current = null;
+      }
     }
+
+    // Cleanup function to clear the watch when the component unmounts
+    return () => {
+      if (locationWatchId.current !== null) {
+        navigator.geolocation.clearWatch(locationWatchId.current);
+      }
+    };
   }, [open]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,10 +168,10 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
                 {isLocating ? (
                     <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Getting your location...</span>
+                        <span>Acquiring your live location...</span>
                     </>
                 ) : location ? (
-                    <span>{`Lat: ${location.lat.toFixed(4)}, Lng: ${location.lng.toFixed(4)}`}</span>
+                    <span>{`Lat: ${location.lat.toFixed(6)}, Lng: ${location.lng.toFixed(6)}`}</span>
                 ) : (
                     <span className="text-destructive">Location access denied.</span>
                 )}
