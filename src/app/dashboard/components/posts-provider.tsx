@@ -9,6 +9,7 @@ import { useUser } from './user-provider';
 interface PostsContextType {
   posts: Post[];
   addPost: (post: { text: string; mediaUrl?: string }) => void;
+  updatePost: (postId: string, updates: Partial<Post>) => void;
   deletePost: (postId: string) => void;
 }
 
@@ -34,12 +35,20 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     setPosts(prevPosts => [newPost, ...prevPosts]);
   };
 
+  const updatePost = (postId: string, updates: Partial<Post>) => {
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.id === postId ? { ...post, ...updates } : post
+      )
+    );
+  };
+
   const deletePost = (postId: string) => {
     setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
   };
 
   return (
-    <PostsContext.Provider value={{ posts, addPost, deletePost }}>
+    <PostsContext.Provider value={{ posts, addPost, updatePost, deletePost }}>
       {children}
     </PostsContext.Provider>
   );

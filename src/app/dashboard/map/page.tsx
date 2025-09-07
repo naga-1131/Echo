@@ -1,8 +1,10 @@
+
 "use client";
 
 import { APIProvider } from "@vis.gl/react-google-maps";
 import WasteMap from "./components/waste-map";
 import { API_KEY } from "@/lib/google-maps-api-key";
+import { WasteReportsProvider } from "./components/waste-reports-provider";
 
 export default function MapPage() {
   if (!API_KEY || API_KEY === "YOUR_GOOGLE_MAPS_API_KEY") {
@@ -23,7 +25,9 @@ export default function MapPage() {
   return (
     <div className="h-[calc(100vh-100px)] w-full">
       <APIProvider apiKey={API_KEY}>
-        <WasteMap />
+        <WasteReportsProvider>
+          <WasteMap />
+        </WasteReportsProvider>
       </APIProvider>
     </div>
   );

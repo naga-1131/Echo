@@ -1,15 +1,17 @@
+
 "use client";
 
 import { useState } from "react";
-import { Map, AdvancedMarker, InfoWindow } from "@vis.gl/react-google-maps";
+import { Map, AdvancedMarker, InfoWindow, Pin } from "@vis.gl/react-google-maps";
 import { Button } from "@/components/ui/button";
-import { mockReports } from "@/lib/mock-data";
 import ReportWasteForm from "./report-waste-form";
 import ReportInfoWindow from "./report-info-window";
 import type { WasteReport } from "@/lib/types";
 import { Plus } from "lucide-react";
+import { useWasteReports } from "./waste-reports-provider";
 
 export default function WasteMap() {
+  const { reports } = useWasteReports();
   const [selectedReport, setSelectedReport] = useState<WasteReport | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -18,22 +20,25 @@ export default function WasteMap() {
       <Map
         style={{ width: "100%", height: "100%" }}
         defaultCenter={{ lat: 12.9716, lng: 77.5946 }}
-        defaultZoom={13}
+        defaultZoom={12}
         gestureHandling={"greedy"}
         disableDefaultUI={true}
         mapId="a3b0c4d0e8f0a9b"
       >
-        {mockReports.map((report) => (
+        {reports.map((report) => (
           <AdvancedMarker
             key={report.id}
             position={report.location}
             onClick={() => setSelectedReport(report)}
-          />
+          >
+            <Pin background={"#FF0000"} glyphColor={"#FFFFFF"} borderColor={"#FF0000"} />
+          </AdvancedMarker>
         ))}
         {selectedReport && (
           <InfoWindow
             position={selectedReport.location}
             onCloseClick={() => setSelectedReport(null)}
+             pixelOffset={[0, -30]}
           >
             <ReportInfoWindow report={selectedReport} />
           </InfoWindow>

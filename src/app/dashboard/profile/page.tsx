@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockUsers } from '@/lib/mock-data';
 import PostCard from '@/components/post-card';
 import EditProfileForm from './components/edit-profile-form';
 import { Users } from 'lucide-react';
@@ -13,15 +12,11 @@ import { usePosts } from '../components/posts-provider';
 import { useUser } from '../components/user-provider';
 import UserListDialog from '../components/user-list-dialog';
 import type { User } from '@/lib/types';
-
-const mockCommunities = [
-  {id: 'c1', name: 'Global Climate Action', memberCount: 1200, imageUrl: 'https://picsum.photos/seed/c1/200/200'},
-  {id: 'c2', name: 'Local Gardeners', memberCount: 150, imageUrl: 'https://picsum.photos/seed/c2/200/200'},
-];
+import { mockCommunities } from '@/lib/mock-data';
 
 export default function ProfilePage() {
   const { posts } = usePosts();
-  const { user } = useUser();
+  const { user, users } = useUser();
   const [followersOpen, setFollowersOpen] = useState(false);
   const [followingOpen, setFollowingOpen] = useState(false);
   
@@ -36,11 +31,11 @@ export default function ProfilePage() {
   );
 
   const getFollowers = (): User[] => {
-    return mockUsers.filter(u => user.followers.includes(u.id));
+    return users.filter(u => user.followers.includes(u.id));
   }
 
   const getFollowing = (): User[] => {
-      return mockUsers.filter(u => user.following.includes(u.id));
+      return users.filter(u => user.following.includes(u.id));
   }
 
   return (
@@ -71,10 +66,10 @@ export default function ProfilePage() {
             </p>
             <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
                 <button onClick={() => setFollowingOpen(true)} className="flex items-center gap-1 hover:underline">
-                    <span className="font-bold text-foreground">{user.following.length}</span> Following
+                    <span className="font-bold text-foreground">{getFollowing().length}</span> Following
                 </button>
                  <button onClick={() => setFollowersOpen(true)} className="flex items-center gap-1 hover:underline">
-                    <span className="font-bold text-foreground">{user.followers.length}</span> Followers
+                    <span className="font-bold text-foreground">{getFollowers().length}</span> Followers
                 </button>
             </div>
           </div>
@@ -93,7 +88,7 @@ export default function ProfilePage() {
         <TabsContent value="posts">
           <div className="space-y-6 mt-6">
             {userPosts.map(post => {
-              const postUser = mockUsers.find(u => u.id === post.userId) || user;
+              const postUser = users.find(u => u.id === post.userId) || user;
               return <PostCard key={post.id} post={post} user={postUser} />;
             })}
              {userPosts.length === 0 && <p className="text-muted-foreground text-center py-8">No posts yet.</p>}
@@ -102,7 +97,7 @@ export default function ProfilePage() {
         <TabsContent value="saved">
           <div className="space-y-6 mt-6">
             {savedPosts.map(post => {
-              const postUser = mockUsers.find(u => u.id === post.userId);
+              const postUser = users.find(u => u.id === post.userId);
               if (!postUser) return null;
               return <PostCard key={post.id} post={post} user={postUser} />;
             })}

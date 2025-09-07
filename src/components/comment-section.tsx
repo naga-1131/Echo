@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState } from "react";
@@ -7,9 +6,9 @@ import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockUsers } from "@/lib/mock-data";
 import type { Comment, User } from "@/lib/types";
 import { useUser } from "@/app/dashboard/components/user-provider";
+import { usePosts } from "@/app/dashboard/components/posts-provider";
 
 interface CommentSectionProps {
   postId: string;
@@ -17,14 +16,10 @@ interface CommentSectionProps {
   onCommentAdded: () => void;
 }
 
-const getUserById = (userId: string): User | undefined => {
-  return mockUsers.find((user) => user.id === userId);
-};
-
 export default function CommentSection({ postId, comments: initialComments, onCommentAdded }: CommentSectionProps) {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
-  const { user: currentUser } = useUser();
+  const { user: currentUser, users } = useUser();
+  const { updatePost } = usePosts();
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +31,18 @@ export default function CommentSection({ postId, comments: initialComments, onCo
       text: newComment,
       timestamp: new Date(),
     };
-    setComments([...comments, newCommentObj]);
+    
+    const updatedComments = [...initialComments, newCommentObj];
+    updatePost(postId, { comments: updatedComments });
+    
     setNewComment("");
     onCommentAdded();
   };
+
+  const getUserById = (userId: string): User | undefined => {
+    return users.find((user) => user.id === userId);
+  };
+
 
   if (!currentUser) return null;
 
@@ -59,7 +62,7 @@ export default function CommentSection({ postId, comments: initialComments, onCo
         <Button type="submit">Post</Button>
       </form>
       <div className="space-y-4">
-        {comments.map((comment) => {
+        {initialComments.map((comment) => {
           const user = getUserById(comment.userId);
           if (!user) return null;
           return (
@@ -80,7 +83,7 @@ export default function CommentSection({ postId, comments: initialComments, onCo
             </div>
           );
         })}
-         {comments.length === 0 && (
+         {initialComments.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
                 No comments yet. Be the first to comment!
             </p>

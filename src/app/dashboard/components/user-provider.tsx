@@ -7,6 +7,7 @@ import { mockUsers } from '@/lib/mock-data';
 
 interface UserContextType {
   user: User | null;
+  users: User[];
   addUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
   login: (userId: string) => void;
@@ -17,21 +18,22 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>(mockUsers);
 
    useEffect(() => {
     const storedUserId = localStorage.getItem('loggedInUserId');
     if (storedUserId) {
-      const loggedInUser = mockUsers.find(u => u.id === storedUserId) || null;
+      const loggedInUser = users.find(u => u.id === storedUserId) || null;
       setUser(loggedInUser);
     }
-  }, []);
+  }, [users]);
 
   const addUser = (newUser: User) => {
-    mockUsers.push(newUser);
+    setUsers(prevUsers => [...prevUsers, newUser]);
   }
 
   const login = (userId: string) => {
-    const userToLogin = mockUsers.find(u => u.id === userId);
+    const userToLogin = users.find(u => u.id === userId);
     if (userToLogin) {
       setUser(userToLogin);
       localStorage.setItem('loggedInUserId', userId);
@@ -50,15 +52,43 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
       // Also update the mock data so other components see the change
-      const userIndex = mockUsers.findIndex(u => u.id === user.id);
-      if(userIndex !== -1) {
-          mockUsers[userIndex] = updatedUser;
-      }
+      setUsers(prevUsers => {
+          const userIndex = prevUsers.findIndex(u => u.id === user.id);
+          if (userIndex !== -1) {
+              const newUsers = [...prevUsers];
+              
+              // Handle following/followers logic
+              const oldFollowing = prevUsers[userIndex].following;
+              const newFollowing = updatedUser.following;
+
+              // If a user was added to following
+              const followedId = newFollowing.find(id => !oldFollowing.includes(id));
+              if(followedId) {
+                  const followedUserIndex = newUsers.findIndex(u => u.id === followedId);
+                  if(followedUserIndex !== -1) {
+                      newUsers[followedUserIndex].followers.push(user.id);
+                  }
+              }
+
+              // If a user was removed from following
+              const unfollowedId = oldFollowing.find(id => !newFollowing.includes(id));
+              if(unfollowedId) {
+                  const unfollowedUserIndex = newUsers.findIndex(u => u.id === unfollowedId);
+                  if(unfollowedUserIndex !== -1) {
+                      newUsers[unfollowedUserIndex].followers = newUsers[unfollowedUserIndex].followers.filter(id => id !== user.id);
+                  }
+              }
+
+              newUsers[userIndex] = updatedUser;
+              return newUsers;
+          }
+          return prevUsers;
+      });
     }
   };
 
   return (
-    <UserContext.Provider value={{ user, addUser, updateUser, login, logout }}>
+    <UserContext.Provider value={{ user, users, addUser, updateUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );

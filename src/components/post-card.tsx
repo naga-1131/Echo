@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import Image from "next/image";
@@ -16,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Heart, MessageCircle, Repeat, Bookmark, Share2, MoreHorizontal, Trash2 } from "lucide-react";
 import type { Post, User } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import CommentSection from "./comment-section";
 import { useUser } from "@/app/dashboard/components/user-provider";
@@ -30,21 +29,35 @@ interface PostCardProps {
 
 export default function PostCard({ post, user }: PostCardProps) {
   const { user: currentUser, updateUser } = useUser();
-  const { deletePost } = usePosts();
+  const { deletePost, updatePost } = usePosts();
   const { addNotification } = useNotifications();
 
   const [isLiked, setIsLiked] = useState(currentUser ? post.likes.includes(currentUser.id) : false);
-  const [isSaved, setIsSaved] = useState(currentUser ? currentUser.savedPosts.includes(post.id) : false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
+  const [isSaved, setIsSaved] = useState(currentUser ? currentUser.savedPosts.includes(post.id) : false);
   const [showComments, setShowComments] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      setIsLiked(post.likes.includes(currentUser.id));
+      setIsSaved(currentUser.savedPosts.includes(post.id));
+      setLikeCount(post.likes.length);
+    }
+  }, [post, currentUser]);
+
 
   const handleLike = () => {
     if (!currentUser) return;
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
-    setLikeCount(newIsLiked ? likeCount + 1 : likeCount - 1);
     
-    if (newIsLiked) {
+    const newLikes = newIsLiked 
+      ? [...post.likes, currentUser.id]
+      : post.likes.filter(id => id !== currentUser.id);
+    
+    updatePost(post.id, { likes: newLikes });
+
+    if (newIsLiked && post.userId !== currentUser.id) {
       addNotification({
         type: 'like',
         fromUser: currentUser,
@@ -71,12 +84,15 @@ export default function PostCard({ post, user }: PostCardProps) {
 
   const handleCommentAdded = () => {
     if (!currentUser) return;
-     addNotification({
+    // Don't notify if commenting on own post
+    if (currentUser.id !== post.userId) {
+       addNotification({
         type: 'comment',
         fromUser: currentUser,
         post,
         forUserId: post.userId
       });
+    }
   }
 
   const isOwnPost = currentUser?.id === post.userId;

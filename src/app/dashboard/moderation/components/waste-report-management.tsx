@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -21,15 +22,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
-import { mockReports } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import type { WasteReport } from '@/lib/types';
+import { useWasteReports } from '../../map/components/waste-reports-provider';
 
 export default function WasteReportManagement() {
-    const [reports, setReports] = useState<WasteReport[]>(mockReports);
+    const { reports, updateReportStatus } = useWasteReports();
 
     const handleStatusChange = (reportId: string, status: WasteReport['status']) => {
-        setReports(reports.map(report => report.id === reportId ? {...report, status} : report));
+        updateReportStatus(reportId, status);
     };
   
   return (
