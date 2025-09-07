@@ -46,7 +46,7 @@ export default function SignupPage() {
     };
 
     addUser(newUser);
-    login(newUserId);
+    login(newUserId, newUser);
     router.push("/dashboard");
   };
 

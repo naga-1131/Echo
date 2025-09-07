@@ -10,7 +10,7 @@ interface UserContextType {
   users: User[];
   addUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
-  login: (userId: string) => void;
+  login: (userId: string, userObj?: User) => void;
   logout: () => void;
 }
 
@@ -35,8 +35,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUsers(prevUsers => [...prevUsers, newUser]);
   }
 
-  const login = (userId: string) => {
-    const userToLogin = users.find(u => u.id === userId);
+  const login = (userId: string, userObj?: User) => {
+    const userToLogin = userObj || users.find(u => u.id === userId);
     if (userToLogin) {
       setUser(userToLogin);
       localStorage.setItem('loggedInUserId', userId);
