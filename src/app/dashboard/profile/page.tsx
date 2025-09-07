@@ -1,16 +1,18 @@
 
 "use client";
 
-import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import {Card, CardContent} from '@/components/ui/card';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockUsers } from '@/lib/mock-data';
 import PostCard from '@/components/post-card';
 import EditProfileForm from './components/edit-profile-form';
-import {Users, UserPlus} from 'lucide-react';
+import { Users } from 'lucide-react';
 import { usePosts } from '../components/posts-provider';
 import { useUser } from '../components/user-provider';
-import Link from 'next/link';
+import UserListDialog from '../components/user-list-dialog';
+import type { User } from '@/lib/types';
 
 const mockCommunities = [
   {id: 'c1', name: 'Global Climate Action', memberCount: 1200, imageUrl: 'https://picsum.photos/seed/c1/200/200'},
@@ -20,6 +22,8 @@ const mockCommunities = [
 export default function ProfilePage() {
   const { posts } = usePosts();
   const { user } = useUser();
+  const [followersOpen, setFollowersOpen] = useState(false);
+  const [followingOpen, setFollowingOpen] = useState(false);
   
   if (!user) {
     return <div>Loading...</div>;
@@ -30,6 +34,14 @@ export default function ProfilePage() {
   const userCommunities = mockCommunities.filter(c =>
     user.communities.includes(c.id)
   );
+
+  const getFollowers = (): User[] => {
+    return mockUsers.filter(u => user.followers.includes(u.id));
+  }
+
+  const getFollowing = (): User[] => {
+      return mockUsers.filter(u => user.following.includes(u.id));
+  }
 
   return (
     <div className="container mx-auto max-w-4xl">
@@ -58,16 +70,19 @@ export default function ProfilePage() {
               {user.bio}
             </p>
             <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
+                <button onClick={() => setFollowingOpen(true)} className="flex items-center gap-1 hover:underline">
                     <span className="font-bold text-foreground">{user.following.length}</span> Following
-                </div>
-                 <div className="flex items-center gap-1">
+                </button>
+                 <button onClick={() => setFollowersOpen(true)} className="flex items-center gap-1 hover:underline">
                     <span className="font-bold text-foreground">{user.followers.length}</span> Followers
-                </div>
+                </button>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      <UserListDialog open={followingOpen} onOpenChange={setFollowingOpen} title="Following" users={getFollowing()} />
+      <UserListDialog open={followersOpen} onOpenChange={setFollowersOpen} title="Followers" users={getFollowers()} />
 
       <Tabs defaultValue="posts">
         <TabsList className="grid w-full grid-cols-3">

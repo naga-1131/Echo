@@ -12,6 +12,7 @@ import { usePosts } from '@/app/dashboard/components/posts-provider';
 import { mockUsers } from '@/lib/mock-data';
 import type { User as UserType } from '@/lib/types';
 import { UserPlus, UserCheck } from 'lucide-react';
+import UserListDialog from '../../components/user-list-dialog';
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -21,6 +22,8 @@ export default function UserProfilePage() {
   const { user: currentUser, updateUser } = useUser();
   const { posts } = usePosts();
   const [profileUser, setProfileUser] = useState<UserType | null>(null);
+  const [followersOpen, setFollowersOpen] = useState(false);
+  const [followingOpen, setFollowingOpen] = useState(false);
   
   useEffect(() => {
     if (userId) {
@@ -29,7 +32,7 @@ export default function UserProfilePage() {
         return;
       }
       const foundUser = mockUsers.find(u => u.id === userId);
-      setProfileUser(foundUser || null);
+      setProfileUser(foundUser ? {...foundUser} : null); // Create a copy to avoid direct mutation
     }
   }, [userId, currentUser, router]);
 
@@ -42,23 +45,28 @@ export default function UserProfilePage() {
   const isFollowing = currentUser.following.includes(profileUser.id);
 
   const handleFollowToggle = () => {
-    const currentFollowing = currentUser.following;
-    const targetFollowers = profileUser.followers;
+    if (!profileUser) return;
 
     if (isFollowing) {
-      updateUser({ following: currentFollowing.filter(id => id !== profileUser.id) });
-      setProfileUser({
-          ...profileUser,
-          followers: targetFollowers.filter(id => id !== currentUser.id),
-      });
+      // Unfollow
+      updateUser({ following: currentUser.following.filter(id => id !== profileUser.id) });
+      setProfileUser(prev => prev ? { ...prev, followers: prev.followers.filter(id => id !== currentUser.id) } : null);
     } else {
-      updateUser({ following: [...currentFollowing, profileUser.id] });
-      setProfileUser({
-          ...profileUser,
-          followers: [...targetFollowers, currentUser.id],
-      });
+      // Follow
+      updateUser({ following: [...currentUser.following, profileUser.id] });
+       setProfileUser(prev => prev ? { ...prev, followers: [...prev.followers, currentUser.id] } : null);
     }
   };
+
+  const getFollowers = (): UserType[] => {
+    if (!profileUser) return [];
+    return mockUsers.filter(u => profileUser.followers.includes(u.id));
+  }
+
+  const getFollowing = (): UserType[] => {
+      if (!profileUser) return [];
+      return mockUsers.filter(u => profileUser.following.includes(u.id));
+  }
 
   return (
     <div className="container mx-auto max-w-4xl">
@@ -90,16 +98,19 @@ export default function UserProfilePage() {
               {profileUser.bio}
             </p>
              <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
+                <button onClick={() => setFollowingOpen(true)} className="flex items-center gap-1 hover:underline">
                     <span className="font-bold text-foreground">{profileUser.following.length}</span> Following
-                </div>
-                 <div className="flex items-center gap-1">
+                </button>
+                 <button onClick={() => setFollowersOpen(true)} className="flex items-center gap-1 hover:underline">
                     <span className="font-bold text-foreground">{profileUser.followers.length}</span> Followers
-                </div>
+                </button>
             </div>
           </div>
         </CardContent>
       </Card>
+      
+      <UserListDialog open={followingOpen} onOpenChange={setFollowingOpen} title="Following" users={getFollowing()} />
+      <UserListDialog open={followersOpen} onOpenChange={setFollowersOpen} title="Followers" users={getFollowers()} />
 
        <div className="space-y-6 mt-6">
         <h2 className="text-xl font-bold font-headline">Posts</h2>
