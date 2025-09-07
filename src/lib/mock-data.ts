@@ -99,6 +99,7 @@ export const mockNotifications: Notification[] = [
     {
         id: 'n1',
         type: 'like',
+        forUserId: 'u1',
         fromUser: mockUsers[1],
         post: mockPosts[0],
         timestamp: new Date(Date.now() - 1000 * 60 * 5),
@@ -107,6 +108,7 @@ export const mockNotifications: Notification[] = [
     {
         id: 'n2',
         type: 'follow',
+        forUserId: 'u1',
         fromUser: mockUsers[1],
         timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
         read: true,
@@ -114,6 +116,7 @@ export const mockNotifications: Notification[] = [
      {
         id: 'n3',
         type: 'comment',
+        forUserId: 'u1',
         fromUser: mockUsers[1],
         post: mockPosts[0],
         timestamp: new Date(Date.now() - 1000 * 60 * 60),

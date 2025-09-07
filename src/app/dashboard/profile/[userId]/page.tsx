@@ -65,6 +65,8 @@ export default function UserProfilePage() {
        addNotification({
           type: 'follow',
           fromUser: currentUser,
+          // The notification is FOR the profileUser
+          forUserId: profileUser.id, 
         });
     } else {
       // Current user unfollows profileUser

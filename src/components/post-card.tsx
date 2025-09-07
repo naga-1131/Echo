@@ -44,12 +44,12 @@ export default function PostCard({ post, user }: PostCardProps) {
     setIsLiked(newIsLiked);
     setLikeCount(newIsLiked ? likeCount + 1 : likeCount - 1);
     
-    // Only send a notification if the person liking is NOT the post owner
-    if(newIsLiked && currentUser.id !== post.userId) {
+    if (newIsLiked) {
       addNotification({
         type: 'like',
         fromUser: currentUser,
         post,
+        forUserId: post.userId,
       });
     }
   };
@@ -71,14 +71,12 @@ export default function PostCard({ post, user }: PostCardProps) {
 
   const handleCommentAdded = () => {
     if (!currentUser) return;
-     // Only send a notification if the person commenting is NOT the post owner
-    if (currentUser.id !== post.userId) {
      addNotification({
         type: 'comment',
         fromUser: currentUser,
         post,
+        forUserId: post.userId
       });
-    }
   }
 
   const isOwnPost = currentUser?.id === post.userId;

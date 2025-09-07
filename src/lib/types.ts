@@ -53,6 +53,7 @@ export interface WasteReport {
 
 export interface Notification {
   id: string;
+  forUserId: string;
   type: 'like' | 'comment' | 'follow';
   fromUser: User;
   post?: Post;
