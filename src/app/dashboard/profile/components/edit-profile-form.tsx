@@ -16,6 +16,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import type {User} from '@/lib/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface EditProfileFormProps {
   user: User;
@@ -23,6 +24,18 @@ interface EditProfileFormProps {
 
 export default function EditProfileForm({user}: EditProfileFormProps) {
   const [open, setOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(user.profilePic);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -37,6 +50,20 @@ export default function EditProfileForm({user}: EditProfileFormProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div className="flex flex-col items-center gap-4">
+            <input type="file" id="profile-pic-upload" className="hidden" accept="image/*" onChange={handleImageChange} />
+            <Label htmlFor="profile-pic-upload" className="cursor-pointer">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={previewImage || user.profilePic} alt={user.username} data-ai-hint="user avatar" />
+                <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+              </Avatar>
+            </Label>
+            <Button variant="link" asChild>
+                <Label htmlFor="profile-pic-upload" className="cursor-pointer">
+                    Change profile picture
+                </Label>
+            </Button>
+          </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="text-right">
               Username
