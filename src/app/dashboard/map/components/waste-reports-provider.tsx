@@ -1,9 +1,10 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
 import type { WasteReport } from '@/lib/types';
 import { mockReports } from '@/lib/mock-data';
+import { subHours } from 'date-fns';
 
 interface WasteReportsContextType {
   reports: WasteReport[];
@@ -33,9 +34,15 @@ export function WasteReportsProvider({ children }: { children: ReactNode }) {
       )
     );
   };
+  
+  const activeReports = useMemo(() => {
+    const twentyFourHoursAgo = subHours(new Date(), 24);
+    return reports.filter(report => new Date(report.timestamp) > twentyFourHoursAgo);
+  }, [reports]);
+
 
   return (
-    <WasteReportsContext.Provider value={{ reports, addReport, updateReportStatus }}>
+    <WasteReportsContext.Provider value={{ reports: activeReports, addReport, updateReportStatus }}>
       {children}
     </WasteReportsContext.Provider>
   );

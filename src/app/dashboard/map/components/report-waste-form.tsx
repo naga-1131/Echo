@@ -52,7 +52,8 @@ export default function ReportWasteForm({ open, onOpenChange }: ReportWasteFormP
           console.error(err);
           setError("Could not get your location. Please enable location services.");
           setIsLocating(false);
-        }
+        },
+        { enableHighAccuracy: true } // Request high accuracy
       );
     }
   }, [open]);
