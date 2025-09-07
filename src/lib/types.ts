@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   username: string;
@@ -18,7 +19,7 @@ export interface Post {
   repostOf?: string;
   communityId?: string;
   timestamp: Date;
-  commentCount: number;
+  comments: Comment[];
 }
 
 export interface Comment {

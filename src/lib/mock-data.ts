@@ -1,4 +1,5 @@
-import type { User, Post, WasteReport } from './types';
+
+import type { User, Post, WasteReport, Comment } from './types';
 
 export const mockUsers: User[] = [
   {
@@ -19,6 +20,13 @@ export const mockUsers: User[] = [
   },
 ];
 
+export const mockComments: Comment[] = [
+    { id: 'c1', userId: 'u2', text: 'Great work!', timestamp: new Date(Date.now() - 1000 * 60 * 60) },
+    { id: 'c2', userId: 'u1', text: 'Thanks for sharing!', timestamp: new Date(Date.now() - 1000 * 60 * 30) },
+    { id: 'c3', userId: 'u2', text: 'Super helpful.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 23) },
+];
+
+
 export const mockPosts: Post[] = [
   {
     id: 'p1',
@@ -28,7 +36,7 @@ export const mockPosts: Post[] = [
     mediaType: 'image',
     likes: ['u2'],
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    commentCount: 2,
+    comments: [mockComments[0], mockComments[1]],
   },
   {
     id: 'p2',
@@ -36,7 +44,7 @@ export const mockPosts: Post[] = [
     text: 'Check out this guide to starting your own compost bin at home. It’s easier than you think! 🌱 #composting #sustainability',
     likes: ['u1'],
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    commentCount: 5,
+    comments: [mockComments[2]],
   },
   {
     id: 'p3',
@@ -46,7 +54,7 @@ export const mockPosts: Post[] = [
     mediaType: 'image',
     likes: [],
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
-    commentCount: 1,
+    comments: [],
   },
 ];
 

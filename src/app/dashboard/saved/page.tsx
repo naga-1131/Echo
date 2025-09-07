@@ -1,9 +1,10 @@
+
 import PostCard from "@/components/post-card";
 import { mockPosts, mockUsers } from "@/lib/mock-data";
 
 export default function SavedPostsPage() {
     const currentUser = mockUsers[0];
-    const savedPosts = mockPosts.filter(p => currentUser.savedPosts.includes(p.id));
+    const savedPosts = mockPosts.filter(p => currentUser.savedPosts.includes(p.id)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
     <div className="container mx-auto max-w-2xl">
@@ -16,8 +17,9 @@ export default function SavedPostsPage() {
                 return <PostCard key={post.id} post={post} user={user} />;
             })
         ) : (
-            <div className="text-center py-16 text-muted-foreground">
+            <div className="text-center py-16 text-muted-foreground bg-card rounded-lg">
                 <p>You haven't saved any posts yet.</p>
+                <p className="text-sm">Click the bookmark icon on a post to save it for later.</p>
             </div>
         )}
       </div>

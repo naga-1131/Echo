@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -14,6 +15,7 @@ import { Heart, MessageCircle, Repeat, Bookmark, Share2 } from "lucide-react";
 import type { Post, User } from "@/lib/types";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import CommentSection from "./comment-section";
 
 interface PostCardProps {
   post: Post;
@@ -24,6 +26,7 @@ export default function PostCard({ post, user }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
+  const [showComments, setShowComments] = useState(false);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -62,15 +65,15 @@ export default function PostCard({ post, user }: PostCardProps) {
           />
         </div>
       )}
-      <CardFooter className="p-2">
+      <CardFooter className="p-2 flex-col items-start">
         <div className="flex w-full justify-around">
           <Button variant="ghost" size="sm" onClick={handleLike} className="flex items-center gap-2">
             <Heart className={cn("h-4 w-4", isLiked && "fill-red-500 text-red-500")} />
             <span>{likeCount}</span>
           </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={() => setShowComments(!showComments)}>
             <MessageCircle className="h-4 w-4" />
-            <span>{post.commentCount}</span>
+            <span>{post.comments.length}</span>
           </Button>
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
             <Repeat className="h-4 w-4" />
@@ -82,6 +85,7 @@ export default function PostCard({ post, user }: PostCardProps) {
             <Share2 className="h-4 w-4" />
           </Button>
         </div>
+        {showComments && <CommentSection postId={post.id} comments={post.comments} />}
       </CardFooter>
     </Card>
   );

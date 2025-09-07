@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +24,7 @@ export default function SignupPage() {
           <CardDescription>Join our community and start making a difference.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4">
+          <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
               <Input id="username" placeholder="greenturtle" required />
@@ -46,7 +47,7 @@ export default function SignupPage() {
                   Create Account
                </Button>
             </Link>
-          </form>
+          </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/" className="underline">

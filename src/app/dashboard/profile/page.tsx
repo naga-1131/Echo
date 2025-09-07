@@ -9,14 +9,14 @@ import EditProfileForm from './components/edit-profile-form';
 import {Users} from 'lucide-react';
 
 const mockCommunities = [
-  {id: 'c1', name: 'Global Climate Action', memberCount: 1200},
-  {id: 'c2', name: 'Local Gardeners', memberCount: 150},
+  {id: 'c1', name: 'Global Climate Action', memberCount: 1200, imageUrl: 'https://picsum.photos/seed/c1/200/200'},
+  {id: 'c2', name: 'Local Gardeners', memberCount: 150, imageUrl: 'https://picsum.photos/seed/c2/200/200'},
 ];
 
 export default function ProfilePage() {
   const user = mockUsers[0];
-  const userPosts = mockPosts.filter(p => p.userId === user.id);
-  const savedPosts = mockPosts.filter(p => user.savedPosts.includes(p.id));
+  const userPosts = mockPosts.filter(p => p.userId === user.id).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  const savedPosts = mockPosts.filter(p => user.savedPosts.includes(p.id)).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   const userCommunities = mockCommunities.filter(c =>
     user.communities.includes(c.id)
   );
@@ -65,6 +65,7 @@ export default function ProfilePage() {
               if (!postUser) return null;
               return <PostCard key={post.id} post={post} user={postUser} />;
             })}
+             {userPosts.length === 0 && <p className="text-muted-foreground text-center py-8">No posts yet.</p>}
           </div>
         </TabsContent>
         <TabsContent value="saved">
@@ -74,23 +75,27 @@ export default function ProfilePage() {
               if (!postUser) return null;
               return <PostCard key={post.id} post={post} user={postUser} />;
             })}
+            {savedPosts.length === 0 && <p className="text-muted-foreground text-center py-8">No saved posts yet.</p>}
           </div>
         </TabsContent>
         <TabsContent value="communities">
           <div className="grid gap-4 md:grid-cols-2 mt-6">
             {userCommunities.map(community => (
-              <Card key={community.id}>
-                <CardHeader>
-                  <CardTitle>{community.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center text-muted-foreground">
-                    <Users className="mr-2" />
-                    <span>{community.memberCount} members</span>
+              <Card key={community.id} className="flex items-center p-4 gap-4">
+                 <Avatar className="h-16 w-16">
+                    <AvatarImage src={community.imageUrl} alt={community.name} data-ai-hint="community logo" />
+                    <AvatarFallback>{community.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold">{community.name}</h3>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Users className="mr-1.5 h-4 w-4" />
+                    <span>{community.memberCount.toLocaleString()} members</span>
                   </div>
-                </CardContent>
+                </div>
               </Card>
             ))}
+             {userCommunities.length === 0 && <p className="text-muted-foreground text-center py-8 md:col-span-2">You haven't joined any communities yet.</p>}
           </div>
         </TabsContent>
       </Tabs>

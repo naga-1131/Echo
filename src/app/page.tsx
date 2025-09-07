@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +24,7 @@ export default function LoginPage() {
           <CardDescription>Connect for a Greener Planet</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4">
+          <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -31,6 +32,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                defaultValue="jane.doe@example.com"
               />
             </div>
             <div className="grid gap-2">
@@ -43,7 +45,7 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" required defaultValue="password" />
             </div>
             <Link href="/dashboard" passHref>
                <Button type="button" className="w-full">
@@ -55,7 +57,7 @@ export default function LoginPage() {
                   Login with Google
                </Button>
             </Link>
-          </form>
+          </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline">
