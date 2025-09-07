@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Repeat, Bookmark, Share2 } from "lucide-react";
 import type { Post, User } from "@/lib/types";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface PostCardProps {
   post: Post;
