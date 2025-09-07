@@ -10,6 +10,7 @@ interface NotificationsContextType {
   notifications: Notification[];
   addNotification: (notification: { type: 'like' | 'comment' | 'follow'; fromUser: User; post?: Post, forUserId: string }) => void;
   markAsRead: (notificationId: string) => void;
+  markAllAsRead: () => void;
   unreadCount: number;
 }
 
@@ -44,10 +45,16 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     );
   };
   
+  const markAllAsRead = () => {
+    setNotifications(prevNotifications =>
+      prevNotifications.map(n => (n.forUserId === user?.id ? { ...n, read: true } : n))
+    );
+  };
+
   const unreadCount = userNotifications.filter(n => !n.read).length;
 
   return (
-    <NotificationsContext.Provider value={{ notifications: userNotifications, addNotification, markAsRead, unreadCount }}>
+    <NotificationsContext.Provider value={{ notifications: userNotifications, addNotification, markAsRead, markAllAsRead, unreadCount }}>
       {children}
     </NotificationsContext.Provider>
   );
