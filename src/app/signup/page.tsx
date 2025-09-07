@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EcoNexusLogo } from "@/components/icons";
+import { EchoSyncLogo } from "@/components/icons";
 import { useUser } from "../dashboard/components/user-provider";
 
 export default function SignupPage() {
@@ -55,7 +55,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
-            <EcoNexusLogo className="h-12 w-12" />
+            <EchoSyncLogo className="h-12 w-12" />
           </div>
           <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
           <CardDescription>Join our community and start making a difference.</CardDescription>

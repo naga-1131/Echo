@@ -13,8 +13,8 @@ const ptSans = PT_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "EcoNexus",
-  description: "Eco-Social Networking with Firebase",
+  title: "EchoSync",
+  description: "The Eco-Social Network with AI & Maps",
 };
 
 export default function RootLayout({

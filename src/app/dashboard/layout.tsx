@@ -12,7 +12,7 @@ import {
   SidebarFooter,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { EcoNexusLogo } from '@/components/icons';
+import { EchoSyncLogo } from '@/components/icons';
 import Header from './components/header';
 import MainNav from './components/main-nav';
 import { PostsProvider } from './components/posts-provider';
@@ -41,8 +41,8 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader className="flex items-center gap-2">
-          <EcoNexusLogo className="size-8 shrink-0 text-primary" />
-          <span className="text-lg font-semibold font-headline text-primary">EcoNexus</span>
+          <EchoSyncLogo className="size-8 shrink-0 text-primary" />
+          <span className="text-lg font-semibold font-headline text-primary">EchoSync</span>
         </SidebarHeader>
         <SidebarContent>
           <MainNav />

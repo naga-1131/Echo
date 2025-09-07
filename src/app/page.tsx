@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EcoNexusLogo } from "@/components/icons";
+import { EchoSyncLogo } from "@/components/icons";
 import { mockUsers } from "@/lib/mock-data";
 import Link from "next/link";
 import { useUser } from "./dashboard/components/user-provider";
@@ -40,10 +40,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
-            <EcoNexusLogo className="h-12 w-12" />
+            <EchoSyncLogo className="h-12 w-12" />
           </div>
-          <CardTitle className="text-2xl font-headline">Welcome to EcoNexus</CardTitle>
-          <CardDescription>Connect for a Greener Planet</CardDescription>
+          <CardTitle className="text-2xl font-headline">Welcome to EchoSync</CardTitle>
+          <CardDescription>The Eco-Social Network with AI & Maps</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
