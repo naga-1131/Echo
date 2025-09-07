@@ -15,7 +15,7 @@ import { EchoSyncLogo } from '@/components/icons';
 import Header from './components/header';
 import MainNav from './components/main-nav';
 import { PostsProvider } from './components/posts-provider';
-import { useUser } from './components/user-provider';
+import { UserProvider, useUser } from './components/user-provider';
 import SidebarUser from './components/sidebar-user';
 import { NotificationsProvider } from './components/notifications-provider';
 import { WasteReportsProvider } from './map/components/waste-reports-provider';
