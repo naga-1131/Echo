@@ -66,12 +66,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <NotificationsProvider>
-      <PostsProvider>
-        <WasteReportsProvider>
-            <ProtectedLayout>{children}</ProtectedLayout>
-        </WasteReportsProvider>
-      </PostsProvider>
-    </NotificationsProvider>
+    <UserProvider>
+        <NotificationsProvider>
+        <PostsProvider>
+            <WasteReportsProvider>
+                <ProtectedLayout>{children}</ProtectedLayout>
+            </WasteReportsProvider>
+        </PostsProvider>
+        </NotificationsProvider>
+    </UserProvider>
   );
 }

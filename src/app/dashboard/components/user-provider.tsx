@@ -21,10 +21,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>(mockUsers);
 
    useEffect(() => {
-    const storedUserId = localStorage.getItem('loggedInUserId');
-    if (storedUserId) {
-      const loggedInUser = users.find(u => u.id === storedUserId) || null;
-      setUser(loggedInUser);
+    // Prevent hydration errors by running this on the client only
+    if (typeof window !== 'undefined') {
+        const storedUserId = localStorage.getItem('loggedInUserId');
+        if (storedUserId) {
+            const loggedInUser = users.find(u => u.id === storedUserId) || null;
+            setUser(loggedInUser);
+        }
     }
   }, [users]);
 
@@ -62,7 +65,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
               const newFollowing = updatedUser.following;
 
               // If a user was added to following
-              const followedId = newFollowing.find(id => !oldFollowing.includes(id));
+              const followedId = newFollowing?.find(id => !oldFollowing.includes(id));
               if(followedId) {
                   const followedUserIndex = newUsers.findIndex(u => u.id === followedId);
                   if(followedUserIndex !== -1) {
@@ -71,7 +74,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
               }
 
               // If a user was removed from following
-              const unfollowedId = oldFollowing.find(id => !newFollowing.includes(id));
+              const unfollowedId = oldFollowing?.find(id => !newFollowing?.includes(id));
               if(unfollowedId) {
                   const unfollowedUserIndex = newUsers.findIndex(u => u.id === unfollowedId);
                   if(unfollowedUserIndex !== -1) {
