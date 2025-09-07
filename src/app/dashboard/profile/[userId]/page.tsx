@@ -48,7 +48,7 @@ export default function UserProfilePage() {
   const isFollowing = currentUser.following.includes(profileUser.id);
 
   const handleFollowToggle = () => {
-    if (!profileUser) return;
+    if (!profileUser || !currentUser) return;
     const newIsFollowing = !isFollowing;
 
     if (newIsFollowing) {

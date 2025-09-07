@@ -60,12 +60,14 @@ export default function PostCard({ post, user }: PostCardProps) {
   }
 
   const handleCommentAdded = () => {
-    if (!currentUser || currentUser.id === post.userId) return;
+    if (!currentUser) return;
+    if (currentUser.id !== post.userId) {
      addNotification({
         type: 'comment',
         fromUser: currentUser,
         post,
       });
+    }
   }
 
   const isOwnPost = currentUser?.id === post.userId;
