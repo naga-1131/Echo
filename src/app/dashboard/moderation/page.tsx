@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContentModerationTool from "./components/content-moderation-tool";
 import WasteReportManagement from "./components/waste-report-management";

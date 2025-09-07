@@ -1,9 +1,10 @@
+
 "use server";
 
 import { moderateContent, type ModerateContentOutput } from "@/ai/flows/content-moderation-flow";
 
 export async function moderateContentAction(
-  prevState: ModerateContentOutput,
+  prevState: ModerateContentOutput | { flagged: null | boolean, reason: string },
   formData: FormData
 ): Promise<ModerateContentOutput> {
   const text = formData.get("text") as string;
