@@ -1,5 +1,9 @@
 
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,8 +15,41 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EcoNexusLogo } from "@/components/icons";
+import { useUser } from "../dashboard/components/user-provider";
 
 export default function SignupPage() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { addUser, login } = useUser();
+
+  const handleSignup = () => {
+    if (!username || !email || !password) {
+      setError("Please fill out all fields.");
+      return;
+    }
+    setError("");
+
+    const newUserId = `u${Date.now()}`;
+    const newUser = {
+      id: newUserId,
+      username,
+      email,
+      profilePic: `https://picsum.photos/seed/${newUserId}/100/100`,
+      bio: '',
+      savedPosts: [],
+      communities: [],
+      followers: [],
+      following: [],
+    };
+
+    addUser(newUser);
+    login(newUserId);
+    router.push("/dashboard");
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
@@ -27,7 +64,13 @@ export default function SignupPage() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" placeholder="greenturtle" required />
+              <Input
+                id="username"
+                placeholder="greenturtle"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -36,17 +79,24 @@ export default function SignupPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required />
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
-            <Link href="/dashboard" passHref>
-               <Button type="button" className="w-full">
-                  Create Account
-               </Button>
-            </Link>
+             {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="button" className="w-full" onClick={handleSignup}>
+              Create Account
+            </Button>
           </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}

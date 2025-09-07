@@ -7,6 +7,7 @@ import { mockUsers } from '@/lib/mock-data';
 
 interface UserContextType {
   user: User | null;
+  addUser: (user: User) => void;
   updateUser: (updates: Partial<User>) => void;
   login: (userId: string) => void;
   logout: () => void;
@@ -24,6 +25,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setUser(loggedInUser);
     }
   }, []);
+
+  const addUser = (newUser: User) => {
+    mockUsers.push(newUser);
+  }
 
   const login = (userId: string) => {
     const userToLogin = mockUsers.find(u => u.id === userId);
@@ -53,7 +58,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, login, logout }}>
+    <UserContext.Provider value={{ user, addUser, updateUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );
