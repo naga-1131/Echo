@@ -23,7 +23,7 @@ export default function Header() {
   const [isCreatePostOpen, setCreatePostOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-  const { user } = useUser();
+  const { user, logout } = useUser();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +31,11 @@ export default function Header() {
       router.push(`/dashboard/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  }
 
   if (!user) return null;
 
@@ -78,7 +83,7 @@ export default function Header() {
             <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/')}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>

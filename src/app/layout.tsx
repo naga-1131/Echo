@@ -1,8 +1,10 @@
+
 import type { Metadata } from "next";
 import { PT_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { UserProvider } from "./dashboard/components/user-provider";
 
 const ptSans = PT_Sans({
   subsets: ["latin"],
@@ -33,7 +35,9 @@ export default function RootLayout({
           ptSans.variable
         )}
       >
-        {children}
+        <UserProvider>
+          {children}
+        </UserProvider>
         <Toaster />
       </body>
     </html>

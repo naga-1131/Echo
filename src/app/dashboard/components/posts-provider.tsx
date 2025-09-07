@@ -3,7 +3,8 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import type { Post } from '@/lib/types';
-import { mockPosts, mockUsers } from '@/lib/mock-data';
+import { mockPosts } from '@/lib/mock-data';
+import { useUser } from './user-provider';
 
 interface PostsContextType {
   posts: Post[];
@@ -15,9 +16,11 @@ const PostsContext = createContext<PostsContextType | undefined>(undefined);
 
 export function PostsProvider({ children }: { children: ReactNode }) {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const currentUser = mockUsers[0];
+  const { user: currentUser } = useUser();
 
   const addPost = ({ text, mediaUrl }: { text: string; mediaUrl?: string }) => {
+    if (!currentUser) return;
+    
     const newPost: Post = {
       id: `p${Date.now()}`,
       userId: currentUser.id,

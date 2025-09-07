@@ -1,5 +1,8 @@
 
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,8 +14,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EcoNexusLogo } from "@/components/icons";
+import { mockUsers } from "@/lib/mock-data";
+import Link from "next/link";
+import { useUser } from "./dashboard/components/user-provider";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("jane.doe@example.com");
+  const [password, setPassword] = useState("password");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { login } = useUser();
+
+  const handleLogin = () => {
+    const userToLogin = mockUsers.find(u => u.email === email);
+    if (userToLogin) {
+      login(userToLogin.id);
+      router.push("/dashboard");
+    } else {
+      setError("Invalid email or password.");
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
@@ -32,7 +54,8 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
-                defaultValue="jane.doe@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -45,18 +68,21 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+               />
             </div>
-            <Link href="/dashboard" passHref>
-               <Button type="button" className="w-full">
-                  Login
-               </Button>
-            </Link>
-            <Link href="/dashboard" passHref>
-               <Button variant="outline" type="button" className="w-full">
-                  Login with Google
-               </Button>
-            </Link>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="button" className="w-full" onClick={handleLogin}>
+              Login
+            </Button>
+            <Button variant="outline" type="button" className="w-full">
+              Login with Google
+            </Button>
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockUsers } from "@/lib/mock-data";
 import type { Comment, User } from "@/lib/types";
+import { useUser } from "@/app/dashboard/components/user-provider";
 
 interface CommentSectionProps {
   postId: string;
@@ -21,11 +22,11 @@ const getUserById = (userId: string): User | undefined => {
 export default function CommentSection({ postId, comments: initialComments }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
-  const currentUser = mockUsers[0]; // Assuming the first user is the current user
+  const { user: currentUser } = useUser();
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newComment.trim() === "") return;
+    if (newComment.trim() === "" || !currentUser) return;
 
     const newCommentObj: Comment = {
       id: `c${Date.now()}`,
@@ -36,6 +37,8 @@ export default function CommentSection({ postId, comments: initialComments }: Co
     setComments([...comments, newCommentObj]);
     setNewComment("");
   };
+
+  if (!currentUser) return null;
 
   return (
     <div className="w-full px-4 pt-4 mt-2 border-t">

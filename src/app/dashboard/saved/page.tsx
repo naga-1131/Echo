@@ -4,10 +4,16 @@
 import PostCard from "@/components/post-card";
 import { mockUsers } from "@/lib/mock-data";
 import { usePosts } from "../components/posts-provider";
+import { useUser } from "../components/user-provider";
 
 export default function SavedPostsPage() {
     const { posts } = usePosts();
-    const currentUser = mockUsers[0];
+    const { user: currentUser } = useUser();
+    
+    if (!currentUser) {
+        return <div>Loading...</div>;
+    }
+
     const savedPosts = posts.filter(p => currentUser.savedPosts.includes(p.id)).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
