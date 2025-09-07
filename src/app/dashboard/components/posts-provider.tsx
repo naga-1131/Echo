@@ -8,6 +8,7 @@ import { mockPosts, mockUsers } from '@/lib/mock-data';
 interface PostsContextType {
   posts: Post[];
   addPost: (post: { text: string; mediaUrl?: string }) => void;
+  deletePost: (postId: string) => void;
 }
 
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
@@ -30,8 +31,12 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     setPosts(prevPosts => [newPost, ...prevPosts]);
   };
 
+  const deletePost = (postId: string) => {
+    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+  };
+
   return (
-    <PostsContext.Provider value={{ posts, addPost }}>
+    <PostsContext.Provider value={{ posts, addPost, deletePost }}>
       {children}
     </PostsContext.Provider>
   );
