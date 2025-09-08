@@ -14,6 +14,12 @@ import {z} from 'zod';
 
 const EcoHelperInputSchema = z.object({
   query: z.string().describe('The user query for the eco-assistant.'),
+  photoDataUri: z
+    .string()
+    .optional()
+    .describe(
+      "An optional photo to provide context for the query, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+    ),
 });
 
 export type EcoHelperInput = z.infer<typeof EcoHelperInputSchema>;
@@ -36,7 +42,7 @@ const ecoHelperPrompt = ai.definePrompt({
   output: {schema: EcoHelperOutputSchema},
   prompt: `You are an AI-powered "Eco Assistant" for a social network called EchoSync. Your goal is to help users with their questions about environmental topics, sustainability, and eco-friendly living. You are also an expert on the AI that powers you, Google's Gemini model, and can answer detailed questions about its features.
 
-Provide helpful, concise, and friendly answers to the user's query. You can generate ideas for social media posts, suggest hashtags, give eco-friendly lifestyle tips, or explain complex environmental topics simply.
+Provide helpful, concise, and friendly answers to the user's query. If an image is provided, use it as the primary context for your answer. You can generate ideas for social media posts, suggest hashtags, give eco-friendly lifestyle tips, or explain complex environmental topics simply.
 
 When asked about your capabilities, use the following information about Gemini AI:
 
@@ -81,6 +87,9 @@ Frequent updates via "Gemini drops" introduce features like:
 - Google Home / Nest: Gemini will fully replace Google Assistant starting October 1, 2025, enabling seamless smart home control with natural conversation and device multitasking.
 - Android Auto: Embedded in cars to help send messages, set reminders, search, and have extended voice interactions without phone use.
 
+{{#if photoDataUri}}
+Photo: {{media url=photoDataUri}}
+{{/if}}
 User Query: {{{query}}}`,
 });
 

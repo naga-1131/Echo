@@ -2,7 +2,7 @@
 "use server";
 
 import { moderateContent, type ModerateContentOutput } from "@/ai/flows/content-moderation-flow";
-import { ecoHelper, type EcoHelperOutput } from "@/ai/flows/eco-helper-flow";
+import { ecoHelper, type EcoHelperInput, type EcoHelperOutput } from "@/ai/flows/eco-helper-flow";
 
 export async function moderateContentAction(
   prevState: ModerateContentOutput | { flagged: null | boolean, reason: string },
@@ -31,15 +31,15 @@ export async function moderateContentAction(
 }
 
 
-export async function askEcoHelperAction(query: string): Promise<EcoHelperOutput> {
-  if (!query) {
+export async function askEcoHelperAction(input: EcoHelperInput): Promise<EcoHelperOutput> {
+  if (!input.query) {
     return {
       response: "Please provide a query.",
     };
   }
   
   try {
-    const result = await ecoHelper({ query });
+    const result = await ecoHelper(input);
     return result;
   } catch (error) {
     console.error("Error during eco helper query:", error);

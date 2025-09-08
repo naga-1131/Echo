@@ -2,39 +2,51 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Loader2, Send, User } from "lucide-react";
+import { Bot, Loader2, Send, User, ImagePlus, X } from "lucide-react";
 import { askEcoHelperAction } from "@/app/actions";
 import { useUser } from "../components/user-provider";
-import { EchoSyncLogo } from "@/components/icons";
 
 interface Message {
   sender: "user" | "bot";
   text: string;
+  imageUrl?: string;
 }
 
 export default function EcoAiPage() {
   const { user } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !imagePreview) return;
 
-    const userMessage: Message = { sender: "user", text: input };
+    const userMessage: Message = { 
+      sender: "user", 
+      text: input,
+      imageUrl: imagePreview || undefined,
+    };
     setMessages((prev) => [...prev, userMessage]);
+    
+    const query = input;
+    const photoDataUri = imagePreview;
+
     setInput("");
+    setImagePreview(null);
     setIsLoading(true);
 
     try {
-      const result = await askEcoHelperAction(input);
+      const result = await askEcoHelperAction({ query, photoDataUri: photoDataUri || undefined });
       const botMessage: Message = { sender: "bot", text: result.response };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
@@ -45,6 +57,17 @@ export default function EcoAiPage() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
   
@@ -98,6 +121,16 @@ export default function EcoAiPage() {
                         : "bg-muted"
                     }`}
                   >
+                    {message.imageUrl && (
+                      <Image 
+                        src={message.imageUrl}
+                        alt="User upload"
+                        width={300}
+                        height={200}
+                        className="rounded-md mb-2"
+                        data-ai-hint="user upload"
+                      />
+                    )}
                     <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                   </div>
                    {message.sender === "user" && user && (
@@ -122,18 +155,45 @@ export default function EcoAiPage() {
               )}
             </div>
           </ScrollArea>
-          <form onSubmit={handleSendMessage} className="flex gap-2 border-t pt-4">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask your Eco AI assistant..."
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </Button>
-          </form>
+          
+          <div className="border-t pt-4">
+             {imagePreview && (
+                <div className="relative w-24 h-24 mb-2">
+                    <Image src={imagePreview} alt="Image preview" layout="fill" className="rounded-md object-cover" />
+                    <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => setImagePreview(null)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+            <form onSubmit={handleSendMessage} className="flex gap-2">
+                 <Input 
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                 />
+                 <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isLoading}>
+                    <ImagePlus className="h-5 w-5" />
+                 </Button>
+                <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask your Eco AI assistant..."
+                className="flex-1"
+                disabled={isLoading}
+                />
+                <Button type="submit" disabled={isLoading || (!input.trim() && !imagePreview)}>
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+            </form>
+          </div>
         </CardContent>
       </Card>
     </div>
