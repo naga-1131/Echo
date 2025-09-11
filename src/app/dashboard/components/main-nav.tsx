@@ -13,6 +13,7 @@ import {
   Search,
   Bot,
   Bell,
+  Mail,
 } from "lucide-react";
 import {
   SidebarMenu,
@@ -23,6 +24,7 @@ import {
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Home" },
   { href: "/dashboard/search", icon: Search, label: "Search" },
+  { href: "/dashboard/messages", icon: Mail, label: "Messages" },
   { href: "/dashboard/eco-ai", icon: Bot, label: "Eco AI" },
   { href: "/dashboard/notifications", icon: Bell, label: "Notifications" },
   { href: "/dashboard/communities", icon: Users, label: "Communities" },

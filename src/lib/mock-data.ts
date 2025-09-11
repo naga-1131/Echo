@@ -1,6 +1,6 @@
 
 
-import type { User, Post, WasteReport, Comment, Notification, Community } from './types';
+import type { User, Post, WasteReport, Comment, Notification, Community, Conversation, Message } from './types';
 
 export const mockUsers: User[] = [
   {
@@ -133,7 +133,7 @@ export const mockNotifications: Notification[] = [
         forUserId: 'u1',
         fromUser: mockUsers[1],
         timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-        read: true,
+        read: false,
     },
      {
         id: 'n3',
@@ -144,4 +144,26 @@ export const mockNotifications: Notification[] = [
         timestamp: new Date(Date.now() - 1000 * 60 * 60),
         read: false,
     },
+]
+
+export const mockConversations: Conversation[] = [
+    {
+        id: 'convo1',
+        participants: ['u1', 'u2'],
+        lastMessageTimestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
+        messages: [
+            {
+                id: 'm1',
+                senderId: 'u2',
+                text: 'Hey! Loved your post about the beach cleanup. Looked like a great turnout!',
+                timestamp: new Date(Date.now() - 1000 * 60 * 16)
+            },
+            {
+                id: 'm2',
+                senderId: 'u1',
+                text: 'Thanks! It was. You should join the next one.',
+                timestamp: new Date(Date.now() - 1000 * 60 * 15)
+            }
+        ]
+    }
 ]

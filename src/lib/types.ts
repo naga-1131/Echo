@@ -65,3 +65,17 @@ export interface Notification {
   timestamp: Date;
   read: boolean;
 }
+
+export interface Message {
+    id: string;
+    senderId: string;
+    text: string;
+    timestamp: Date;
+}
+
+export interface Conversation {
+    id: string;
+    participants: string[];
+    messages: Message[];
+    lastMessageTimestamp: Date;
+}
