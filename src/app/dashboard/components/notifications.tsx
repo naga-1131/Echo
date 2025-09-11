@@ -65,7 +65,9 @@ export default function Notifications() {
   const recentNotifications = notifications.slice(0, 5);
   
   const handleItemClick = (notification: Notification) => {
-    markAsRead(notification.id);
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
     router.push(getNotificationLink(notification));
   }
 

@@ -47,7 +47,7 @@ function getNotificationLink(notification: Notification): string {
 }
 
 export default function NotificationsPage() {
-    const { notifications, markAllAsRead, unreadCount } = useNotifications();
+    const { notifications, markAllAsRead, markAsRead, unreadCount } = useNotifications();
     const router = useRouter();
 
     const groupedNotifications = notifications.reduce((acc, notification) => {
@@ -68,6 +68,13 @@ export default function NotificationsPage() {
         return acc;
     }, {} as Record<string, Notification[]>);
 
+    const handleNotificationClick = (n: Notification) => {
+        if (!n.read) {
+            markAsRead(n.id);
+        }
+        router.push(getNotificationLink(n));
+    }
+
     return (
         <div className="container mx-auto max-w-3xl">
             <Card>
@@ -81,7 +88,7 @@ export default function NotificationsPage() {
                         </CardDescription>
                     </div>
                     {unreadCount > 0 && (
-                        <Button onClick={() => markAllAsRead()}>
+                        <Button onClick={() => markAllAsRead()} disabled={unreadCount === 0}>
                             <CheckCheck className="mr-2 h-4 w-4"/>
                             Mark all as read
                         </Button>
@@ -102,8 +109,8 @@ export default function NotificationsPage() {
                                     <ul className="space-y-2">
                                         {notifs.map(n => (
                                             <li key={n.id}>
-                                                <Link href={getNotificationLink(n)} className={cn(
-                                                    "block p-3 rounded-lg transition-colors hover:bg-muted",
+                                                <button onClick={() => handleNotificationClick(n)} className={cn(
+                                                    "w-full text-left block p-3 rounded-lg transition-colors hover:bg-muted",
                                                     !n.read && "bg-primary/5"
                                                 )}>
                                                     <div className="flex items-start gap-4">
@@ -129,7 +136,7 @@ export default function NotificationsPage() {
                                                             <div className="h-3 w-3 rounded-full bg-primary mt-1" aria-label="Unread"></div>
                                                         )}
                                                     </div>
-                                                </Link>
+                                                </button>
                                             </li>
                                         ))}
                                     </ul>
