@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Search, Video, Phone } from 'lucide-react';
+import { Send, Search, Video, Phone, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
@@ -154,7 +154,7 @@ export default function MessagesPage() {
                     </>
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground">
-                        <Mail className="h-16 w-16 mb-4"/>
+                        <MessageSquare className="h-16 w-16 mb-4"/>
                         <h2 className="text-2xl font-bold">Your Messages</h2>
                         <p>Select a conversation to start chatting.</p>
                     </div>

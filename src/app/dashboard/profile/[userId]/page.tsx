@@ -11,7 +11,7 @@ import { useUser } from '@/app/dashboard/components/user-provider';
 import { usePosts } from '@/app/dashboard/components/posts-provider';
 import { mockUsers } from '@/lib/mock-data';
 import type { User as UserType } from '@/lib/types';
-import { UserPlus, UserCheck } from 'lucide-react';
+import { UserPlus, UserCheck, MessageSquare } from 'lucide-react';
 import UserListDialog from '../../components/user-list-dialog';
 import { useNotifications } from '../../components/notifications-provider';
 
@@ -73,6 +73,12 @@ export default function UserProfilePage() {
     }
   };
 
+  const handleMessage = () => {
+    // In a real app, you would have a function to find or create a conversation
+    // and then redirect. For now, we'll just redirect to the messages page.
+    router.push('/dashboard/messages');
+  }
+
   const getFollowers = (): UserType[] => {
     if (!profileUser) return [];
     return users.filter(u => profileUser.followers.includes(u.id));
@@ -96,7 +102,11 @@ export default function UserProfilePage() {
             />
             <AvatarFallback>{profileUser.username.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end items-center gap-2 mb-4">
+             <Button onClick={handleMessage} variant="outline">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Message
+             </Button>
              <Button onClick={handleFollowToggle} variant={isFollowing ? 'secondary' : 'default'}>
                 {isFollowing ? <UserCheck className="mr-2 h-4 w-4" /> : <UserPlus className="mr-2 h-4 w-4" />}
                 {isFollowing ? 'Following' : 'Follow'}
