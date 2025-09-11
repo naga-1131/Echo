@@ -47,7 +47,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   
   const markAllAsRead = () => {
     setNotifications(prevNotifications =>
-      prevNotifications.map(n => (n.forUserId === user?.id ? { ...n, read: true } : n))
+      prevNotifications.map(n => (n.forUserId === user?.id && !n.read ? { ...n, read: true } : n))
     );
   };
 
