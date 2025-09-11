@@ -19,6 +19,7 @@ import { useNotifications } from './notifications-provider';
 import { cn } from '@/lib/utils';
 import type { Notification } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
 
 function NotificationIcon({ type }: { type: Notification['type'] }) {
     switch (type) {
