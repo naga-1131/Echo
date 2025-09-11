@@ -15,7 +15,7 @@ import { EchoSyncLogo } from '@/components/icons';
 import Header from './components/header';
 import MainNav from './components/main-nav';
 import { PostsProvider } from './components/posts-provider';
-import { UserProvider, useUser } from './components/user-provider';
+import { useUser } from './components/user-provider';
 import SidebarUser from './components/sidebar-user';
 import { NotificationsProvider } from './components/notifications-provider';
 import { WasteReportsProvider } from './map/components/waste-reports-provider';
@@ -65,14 +65,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <UserProvider>
-        <NotificationsProvider>
-        <PostsProvider>
-            <WasteReportsProvider>
-                <ProtectedLayout>{children}</ProtectedLayout>
-            </WasteReportsProvider>
-        </PostsProvider>
-        </NotificationsProvider>
-    </UserProvider>
+      <NotificationsProvider>
+      <PostsProvider>
+          <WasteReportsProvider>
+              <ProtectedLayout>{children}</ProtectedLayout>
+          </WasteReportsProvider>
+      </PostsProvider>
+      </NotificationsProvider>
   );
 }

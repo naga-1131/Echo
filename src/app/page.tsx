@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { EchoSyncLogo } from "@/components/icons";
 import Link from "next/link";
 import { useUser } from "./dashboard/components/user-provider";
-import { UserProvider } from "./dashboard/components/user-provider";
 
 
 function LoginComponent() {
@@ -101,8 +100,6 @@ function LoginComponent() {
 
 export default function LoginPage() {
   return (
-    <UserProvider>
       <LoginComponent />
-    </UserProvider>
   )
 }

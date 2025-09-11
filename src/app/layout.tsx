@@ -35,7 +35,9 @@ export default function RootLayout({
           ptSans.variable
         )}
       >
-        {children}
+        <UserProvider>
+          {children}
+        </UserProvider>
         <Toaster />
       </body>
     </html>

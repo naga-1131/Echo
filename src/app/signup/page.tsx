@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EchoSyncLogo } from "@/components/icons";
-import { useUser, UserProvider } from "../dashboard/components/user-provider";
+import { useUser } from "../dashboard/components/user-provider";
 
 function SignupComponent() {
   const [username, setUsername] = useState("");
@@ -112,8 +112,6 @@ function SignupComponent() {
 
 export default function SignupPage() {
   return (
-    <UserProvider>
       <SignupComponent />
-    </UserProvider>
   )
 }
