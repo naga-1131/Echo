@@ -1,10 +1,9 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { useUser } from '@/app/dashboard/components/user-provider';
 import { mockConversations, mockUsers } from '@/lib/mock-data';
 import type { Conversation, User, Message } from '@/lib/types';
@@ -12,8 +11,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Search, Video, Phone, MessageSquare } from 'lucide-react';
+import { Send, Search, Video, Phone, MessageSquare, Paperclip, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 
 export default function MessagesPage() {
@@ -21,6 +21,8 @@ export default function MessagesPage() {
     const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(conversations[0] || null);
     const [newMessage, setNewMessage] = useState('');
+    const [mediaPreview, setMediaPreview] = useState<{url: string, type: 'image' | 'video'} | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     if (!currentUser) return <div>Loading...</div>;
 
@@ -29,15 +31,31 @@ export default function MessagesPage() {
         return mockUsers.find(u => u.id === otherId);
     }
     
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setMediaPreview({
+                    url: reader.result as string,
+                    type: file.type.startsWith('image/') ? 'image' : 'video'
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !selectedConversation) return;
+        if ((!newMessage.trim() && !mediaPreview) || !selectedConversation) return;
 
         const message: Message = {
             id: `m${Date.now()}`,
             senderId: currentUser.id,
             text: newMessage,
             timestamp: new Date(),
+            mediaUrl: mediaPreview?.url,
+            mediaType: mediaPreview?.type,
         };
 
         const updatedConversation = {
@@ -53,25 +71,37 @@ export default function MessagesPage() {
         setConversations(updatedConversations);
         setSelectedConversation(updatedConversation);
         setNewMessage('');
+        setMediaPreview(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
     }
 
     const sortedConversations = [...conversations].sort((a, b) => new Date(b.lastMessageTimestamp).getTime() - new Date(a.lastMessageTimestamp).getTime());
+    
+    const getLastMessagePreview = (convo: Conversation): string => {
+        const lastMessage = convo.messages[convo.messages.length - 1];
+        if (!lastMessage) return "No messages yet";
+        if (lastMessage.mediaType === 'image') return "Sent an image";
+        if (lastMessage.mediaType === 'video') return "Sent a video";
+        return lastMessage.text;
+    }
 
     return (
         <div className="h-[calc(100vh-100px)] w-full flex border rounded-lg overflow-hidden">
-            <aside className="w-1/3 border-r flex flex-col">
+            <aside className="w-1/3 border-r flex flex-col bg-card">
                 <div className="p-4 border-b">
                     <h2 className="text-xl font-bold font-headline">Messages</h2>
                      <div className="relative mt-2">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="Search messages..." className="pl-8" />
+                        <Input placeholder="Search messages..." className="pl-8 bg-background" />
                     </div>
                 </div>
                 <ScrollArea className="flex-1">
                     {sortedConversations.map(convo => {
                         const otherUser = getOtherParticipant(convo);
                         if (!otherUser) return null;
-                        const lastMessage = convo.messages[convo.messages.length - 1];
+                        
                         return (
                             <button key={convo.id} onClick={() => setSelectedConversation(convo)} className={cn(
                                 "flex items-start gap-3 p-4 w-full text-left hover:bg-muted",
@@ -89,7 +119,7 @@ export default function MessagesPage() {
                                         </p>
                                     </div>
                                     <p className="text-sm text-muted-foreground truncate">
-                                        {lastMessage.text}
+                                       {getLastMessagePreview(convo)}
                                     </p>
                                 </div>
                             </button>
@@ -97,10 +127,10 @@ export default function MessagesPage() {
                     })}
                 </ScrollArea>
             </aside>
-            <main className="w-2/3 flex flex-col">
+            <main className="w-2/3 flex flex-col bg-background">
                 {selectedConversation && getOtherParticipant(selectedConversation) ? (
                     <>
-                        <div className="p-4 border-b flex justify-between items-center">
+                        <div className="p-4 border-b flex justify-between items-center bg-card">
                            <div className="flex items-center gap-3">
                              <Avatar>
                                 <AvatarImage src={getOtherParticipant(selectedConversation)!.profilePic} />
@@ -130,23 +160,65 @@ export default function MessagesPage() {
                                             </Avatar>
                                         )}
                                          <div className={cn(
-                                            "max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2",
-                                            msg.senderId === currentUser.id ? "bg-primary text-primary-foreground" : "bg-muted"
+                                            "max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-3 py-2",
+                                            msg.senderId === currentUser.id ? "bg-primary text-primary-foreground" : "bg-card"
                                          )}>
-                                            <p className="text-sm">{msg.text}</p>
+                                             {msg.mediaUrl && (
+                                                <div className="mb-2">
+                                                {msg.mediaType === 'image' ? (
+                                                    <Image src={msg.mediaUrl} alt="Shared media" width={300} height={200} className="rounded-lg object-cover" />
+                                                ) : (
+                                                    <video src={msg.mediaUrl} controls className="rounded-lg w-full max-w-[300px]" />
+                                                )}
+                                                </div>
+                                            )}
+                                            {msg.text && <p className="text-sm">{msg.text}</p>}
                                          </div>
                                     </div>
                                 ))}
                             </div>
                         </ScrollArea>
-                        <div className="p-4 border-t">
+                        <div className="p-4 border-t bg-card">
+                             {mediaPreview && (
+                                <div className="relative w-24 h-24 mb-2">
+                                     {mediaPreview.type === 'image' ? (
+                                        <Image src={mediaPreview.url} alt="Preview" layout="fill" className="rounded-md object-cover" />
+                                    ) : (
+                                        <video src={mediaPreview.url} className="rounded-md object-cover w-full h-full" />
+                                    )}
+                                    <Button
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                                        onClick={() => {
+                                            setMediaPreview(null)
+                                            if(fileInputRef.current) fileInputRef.current.value = "";
+                                        }}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            )}
                             <form className="flex gap-2" onSubmit={handleSendMessage}>
+                                 <Input 
+                                    id="file-upload"
+                                    type="file"
+                                    accept="image/*,video/*"
+                                    className="hidden"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                 />
+                                 <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()}>
+                                    <Paperclip />
+                                    <span className="sr-only">Attach file</span>
+                                 </Button>
                                 <Input 
                                     placeholder="Type a message..." 
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
+                                    className="bg-background"
                                 />
-                                <Button type="submit" disabled={!newMessage.trim()}>
+                                <Button type="submit" disabled={!newMessage.trim() && !mediaPreview}>
                                     <Send className="h-4 w-4" />
                                 </Button>
                             </form>

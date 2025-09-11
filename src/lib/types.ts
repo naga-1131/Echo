@@ -71,6 +71,8 @@ export interface Message {
     senderId: string;
     text: string;
     timestamp: Date;
+    mediaUrl?: string;
+    mediaType?: 'image' | 'video';
 }
 
 export interface Conversation {

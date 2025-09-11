@@ -163,6 +163,14 @@ export const mockConversations: Conversation[] = [
                 senderId: 'u1',
                 text: 'Thanks! It was. You should join the next one.',
                 timestamp: new Date(Date.now() - 1000 * 60 * 15)
+            },
+            {
+                id: 'm3',
+                senderId: 'u2',
+                text: 'Definitely! Here\'s a pic from a cleanup I did last month.',
+                mediaUrl: 'https://picsum.photos/seed/dm1/400/300',
+                mediaType: 'image',
+                timestamp: new Date(Date.now() - 1000 * 60 * 14)
             }
         ]
     }
