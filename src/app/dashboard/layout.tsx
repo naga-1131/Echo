@@ -14,7 +14,6 @@ import {
 import { EchoSyncLogo } from '@/components/icons';
 import Header from './components/header';
 import MainNav from './components/main-nav';
-import { PostsProvider } from './components/posts-provider';
 import { useUser } from './components/user-provider';
 import SidebarUser from './components/sidebar-user';
 import { NotificationsProvider } from './components/notifications-provider';
@@ -66,11 +65,9 @@ export default function DashboardLayout({
 }) {
   return (
       <NotificationsProvider>
-      <PostsProvider>
           <WasteReportsProvider>
               <ProtectedLayout>{children}</ProtectedLayout>
           </WasteReportsProvider>
-      </PostsProvider>
       </NotificationsProvider>
   );
 }

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { UserProvider } from "./dashboard/components/user-provider";
+import { PostsProvider } from "./dashboard/components/posts-provider";
 
 const ptSans = PT_Sans({
   subsets: ["latin"],
@@ -36,7 +37,9 @@ export default function RootLayout({
         )}
       >
         <UserProvider>
-          {children}
+          <PostsProvider>
+            {children}
+          </PostsProvider>
         </UserProvider>
         <Toaster />
       </body>
