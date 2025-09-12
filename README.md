@@ -6,7 +6,9 @@ To get started, take a look at src/app/page.tsx.
 
 ## Testing with cURL
 
-You can test the Google AI API directly from your terminal using `curl`. Make sure to replace `GEMINI_API_KEY` with your actual API key from your `.env` file.
+You can test the Google AI API directly from your terminal using `curl`. 
+
+This command securely reads your API key from the `.env` file and sends a test prompt to the `gemini-pro` model. Make sure you have added your key to the `.env` file.
 
 ```bash
 curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent" \
